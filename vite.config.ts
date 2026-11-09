@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import react from "@vitejs/plugin-react";
@@ -35,6 +35,37 @@ function fill(html: string, page: HeadPage, origin: string) {
     .replaceAll("__SEO_IMAGE_ALT__", esc(page.imageAlt))
     .replaceAll("__SEO_JSONLD__", serialize(page.jsonld))
     .replace("<!--SEO_NOSCRIPT-->", `<noscript>${page.noscript}</noscript>`);
+}
+
+function preloadDisplayFont(): Plugin {
+  return {
+    name: "preload-display-font",
+    apply: "build",
+    closeBundle() {
+      const dist = path.resolve("dist");
+      const assets = path.join(dist, "assets");
+      const file = readdirSync(assets).find(
+        (name) => name.includes("big-shoulders-display-latin-600") && name.endsWith(".woff2"),
+      );
+      if (!file) throw new Error("Fichier woff2 Big Shoulders Display introuvable pour le preload.");
+      const href = `/maquette-dieteticien/assets/${file}`;
+      const tag = `<link rel="preload" href="${href}" as="font" type="font/woff2" crossorigin />`;
+      const writePreload = (dir: string) => {
+        for (const entry of readdirSync(dir, { withFileTypes: true })) {
+          const target = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            writePreload(target);
+            continue;
+          }
+          if (!entry.name.endsWith(".html")) continue;
+          const html = readFileSync(target, "utf8");
+          if (html.includes(href)) continue;
+          writeFileSync(target, html.replace("</head>", `    ${tag}\n  </head>`));
+        }
+      };
+      writePreload(dist);
+    },
+  };
 }
 
 function seoPlugin(pages: HeadPage[]): Plugin {
@@ -100,6 +131,6 @@ export default defineConfig(async () => {
 
   return {
     base: "/maquette-dieteticien/",
-    plugins: [react(), seoPlugin(mod.manifest.pages)],
+    plugins: [react(), seoPlugin(mod.manifest.pages), preloadDisplayFont()],
   };
 });
