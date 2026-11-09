@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { pageByPath, type PageMeta } from "../content/pages";
 import { publicAsset } from "../lib/paths";
-import { quoteMailto, site } from "../lib/site";
+import { site } from "../lib/site";
 import { useRoute } from "../router";
 
 export function Seo({ page }: { page: PageMeta }) {
@@ -83,37 +83,12 @@ export function Photo({
   );
 }
 
-export function SectionHead({ index, title, intro }: { index: string; title: string; intro?: string }) {
+export function SectionHead({ title, intro }: { title: string; intro?: string }) {
   return (
     <header className="section-head">
-      <p className="section-index">{index}</p>
       <h2>{title}</h2>
       {intro ? <p className="lede">{intro}</p> : null}
     </header>
-  );
-}
-
-export function PrivacyNote({ id }: { id?: string }) {
-  return (
-    <p className="privacy-note" id={id}>
-      {site.privacyNote} Le formulaire se limite à l’identité, aux coordonnées, au type de rendez-vous et au créneau.
-    </p>
-  );
-}
-
-export function QuoteLink({
-  label = "Demander un devis",
-  children,
-  className = "btn btn-secondary",
-}: {
-  label?: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <a className={className} href={quoteMailto()} aria-label={label}>
-      {children}
-    </a>
   );
 }
 

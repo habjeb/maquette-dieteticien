@@ -1,5 +1,5 @@
 import { FaqList } from "../components/FaqList";
-import { BookLink, Photo, PrivacyNote, QuoteLink, SectionHead } from "../components/ui";
+import { BookLink, Photo, SectionHead } from "../components/ui";
 import { domains, faq, heroText, photos, steps } from "../content/editorial";
 import { sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
@@ -25,7 +25,7 @@ function Hero() {
     <section className="hero" id="accueil">
       <div className="container hero-grid">
         <div className="hero-copy">
-          <p className="kicker">01 — {site.jobTitle}</p>
+          <p className="kicker">{site.jobTitle}</p>
           <h1>
             La nutrition au service de votre <em>santé</em> et de vos ambitions.
           </h1>
@@ -38,7 +38,6 @@ function Hero() {
               Découvrir les accompagnements
             </A>
           </div>
-          <PrivacyNote />
         </div>
         <figure className="hero-media">
           <Photo {...photos.hero} priority />
@@ -53,18 +52,16 @@ function Domaines() {
     <section className="section" id="accompagnements">
       <div className="container">
         <SectionHead
-          index="02"
           title="Domaines d’accompagnement"
-          intro="Trois entrées, une même façon de travailler : écouter la situation, puis proposer des repères tenables. Rien n’est un programme standard."
+          intro="Chaque accompagnement commence par un échange sur vos habitudes, vos besoins et vos objectifs. Ensemble, nous définissons des repères que vous pouvez appliquer au quotidien."
         />
         <div className="domain-list">
-          {domains.map((domain, index) => (
+          {domains.map((domain) => (
             <article className="domain" id={`detail-${domain.id}`} key={domain.id}>
               <figure className="domain-media">
                 <Photo {...domain.photo} />
               </figure>
               <div className="domain-body">
-                <p className="kicker">0{index + 1}</p>
                 <h3>
                   <A href={sitePath(domain.path)}>{domain.title}</A>
                 </h3>
@@ -90,9 +87,8 @@ function Presentation() {
         </figure>
         <div>
           <SectionHead
-            index="03"
             title="À propos"
-            intro="Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace dans le secteur de Condrieu."
+            intro="Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace à domicile dans la région sud lyonnaise."
           />
           <dl className="facts">
             <div>
@@ -100,22 +96,23 @@ function Presentation() {
               <dd>{site.diploma}</dd>
             </div>
             <div>
-              <dt>Expériences</dt>
-              <dd>{site.experiences}</dd>
-            </div>
-            <div>
-              <dt>Milieu sportif</dt>
-              <dd>{site.sportBackground}</dd>
+              <dt>Expérience</dt>
+              <dd>
+                {site.experiences}
+                <br />
+                {site.sportBackground}
+              </dd>
             </div>
           </dl>
           <p>
-            L’accompagnement s’appuie sur les recommandations scientifiques et sur ce qui est réaliste pour vous :
-            horaires, goûts, budget, activité, éventuels soins déjà en cours. Je ne propose pas de schéma unique, ni de
-            promesse de résultat.
+            Pour moi, un conseil alimentaire doit avoir sa place dans votre quotidien. En consultation, je prends
+            d’abord le temps de comprendre ce qui vous amène, ce qui vous convient déjà et ce que vous aimeriez faire
+            évoluer.
           </p>
           <p>
-            La nutrition sportive est un domaine d’intérêt. Elle concerne l’alimentation autour de l’entraînement, de la
-            récupération et des échéances. Elle ne résume pas la pratique, qui reste généraliste.
+            Je m’appuie sur les recommandations scientifiques pour vous expliquer les options qui s’offrent à vous, en
+            tenant compte de vos goûts, de votre rythme de vie, de votre budget et, si nécessaire, de votre suivi
+            médical. Ensemble, nous choisissons les premiers changements à essayer, à votre rythme.
           </p>
           <p>
             <A href={sitePath("/carte")}>Ouvrir la carte de visite digitale</A>
@@ -143,9 +140,8 @@ function Methode() {
     <section className="section" id="methode">
       <div className="container">
         <SectionHead
-          index="04"
           title="Méthode d’accompagnement"
-          intro="Trois temps, pour avancer à un rythme tenable. Le déroulé se précise ensemble lors du premier échange. Cette présentation reste indicative."
+          intro="Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent."
         />
         <ol className="steps">
           {steps.map((step, index) => (
@@ -165,21 +161,16 @@ function Consultations() {
   return (
     <section className="section section-sage" id="consultations">
       <div className="container">
-        <SectionHead
-          index="05"
-          title="Modalités de consultation"
-          intro={`${tariffSentence} Les durées indiquées restent à préciser.`}
-        />
+        <SectionHead title="Modalités de consultation" intro={tariffSentence} />
         <div className="consult-grid" data-booking-visible>
           {offers.map((offer) => (
             <article className="consult-card" key={offer.id} id={offer.id}>
               <p className="kicker">{offer.group}</p>
               <h3>{offer.name}</h3>
-              <p>{offer.description}</p>
               <dl>
                 <div>
-                  <dt>Durée indicative</dt>
-                  <dd>{site.duration}</dd>
+                  <dt>Durée</dt>
+                  <dd>{offer.duration}</dd>
                 </div>
                 <div>
                   <dt>Modalité</dt>
@@ -190,18 +181,10 @@ function Consultations() {
                 <BookLink href={offer.href} label={offer.label}>
                   Prendre rendez-vous
                 </BookLink>
-                <QuoteLink label={`Demander un devis : ${offer.group}, ${offer.name}`}>
-                  Demander un devis
-                </QuoteLink>
               </div>
             </article>
           ))}
         </div>
-        <p className="consult-note">
-          « Demander un devis » ouvre un message dans votre messagerie. Rien n’est enregistré sur ce site. Destinataire :{" "}
-          {site.email}. Moyens de paiement : {site.paymentMethods}. Aucun paiement n’est encaissé ici.
-        </p>
-        <PrivacyNote />
       </div>
     </section>
   );
@@ -212,7 +195,6 @@ function Faq() {
     <section className="section" id="faq">
       <div className="container faq-layout">
         <SectionHead
-          index="06"
           title="Questions fréquentes"
           intro="Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire."
         />
@@ -229,8 +211,8 @@ function Reservation() {
         <p className="kicker kicker-light">Rendez-vous</p>
         <h2>Choisir un créneau</h2>
         <p>
-          Quatre liens, selon qu’il s’agit d’un bilan ou d’un suivi, en visio ou en déplacement. Ils ouvrent la page de
-          réservation dans un nouvel onglet. {tariffSentence}
+          Quatre liens : bilan ou suivi, en visioconférence partout en France ou en déplacement dans le secteur de{" "}
+          {site.area}. Ils ouvrent la page de réservation dans un nouvel onglet. {tariffSentence}
         </p>
         <div className="band-actions">
           {offers.map((offer) => (
@@ -238,11 +220,7 @@ function Reservation() {
               {offer.group} — {offer.name}
             </BookLink>
           ))}
-          <QuoteLink label="Demander un devis" className="btn btn-light">
-            Demander un devis
-          </QuoteLink>
         </div>
-        <PrivacyNote />
       </div>
     </section>
   );

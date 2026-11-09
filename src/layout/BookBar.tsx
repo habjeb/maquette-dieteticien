@@ -36,7 +36,6 @@ export function BookBar() {
       <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-primary btn-block">
         Prendre rendez-vous
       </BookLink>
-      <p className="privacy-note">{site.privacyNote}</p>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 /**
  * Identité, coordonnées et données factuelles.
  * Remplacez les valeurs entre crochets et les URL Calendly.
- * Aucun tarif n’est publié : le montant est communiqué avant la consultation ou sur devis.
+ * Aucun tarif n’est publié : le montant est communiqué avant la consultation, lors de la prise de rendez-vous.
  * Ne pas y inscrire de donnée inventée : tant qu’une valeur est un placeholder,
  * elle n’est pas publiée dans les données structurées (téléphone, e-mail, adresse).
  */
@@ -12,8 +12,8 @@ export const site = {
   legalName: "Nicolas Boyer EI",
   jobTitle: "Diététicien-nutritionniste",
   area: "Condrieu",
-  practice:
-    "Consultations en visioconférence et en déplacement dans le secteur de Condrieu",
+  practiceLine:
+    "Exercice libéral. Consultations en visioconférence partout en France et en déplacement dans le secteur de Condrieu.",
 
   phoneDisplay: "[Téléphone à compléter]",
   phoneTel: "",
@@ -24,14 +24,16 @@ export const site = {
   rpps: "[RPPS]",
   professionalRecord: "[Enregistrement professionnel à compléter]",
   diploma: "[Diplôme à compléter]",
-  experiences: "[Expériences à compléter]",
-  sportBackground: "[Expérience sportive à compléter]",
+  experiences:
+    "Milieu hospitalier — Expérience en diabétologie, en pédiatrie et en médecine générale.",
+  sportBackground: "Milieu sportif — Accompagnement nutritionnel de pratiquants de MMA.",
   vat: "[Régime de TVA à compléter, si applicable]",
-  communes: "[Communes desservies à compléter]",
+  communes: ["Condrieu", "Vienne", "Saint-Clair-du-Rhône", "Ampuis"],
   videoTool: "[Outil de visio à compléter]",
-  cancelDelay: "[Délai d’annulation à compléter]",
-  paymentMethods: "[Moyens de paiement à compléter]",
-  duration: "[Durée à compléter]",
+  cancelDelay: "24 h",
+  paymentMethods: "virement et espèces",
+  durationInitial: "60 minutes",
+  durationFollowUp: "30 à 45 minutes",
   googleBusinessUrl: "",
 
   mediatorName: "[Nom du médiateur de la consommation à compléter]",
@@ -61,9 +63,7 @@ export const site = {
 } as const;
 
 export const tariffSentence =
-  "Le tarif est communiqué avant la consultation, lors de la prise de rendez-vous ou sur devis.";
-
-export const quoteSubject = "Demande de devis — consultation de diététique";
+  "Le tarif est communiqué avant la consultation, lors de la prise de rendez-vous.";
 
 export function isRealPhone(value: string) {
   return /^\+[1-9]\d{8,14}$/.test(value);
@@ -71,15 +71,6 @@ export function isRealPhone(value: string) {
 
 export function isRealEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-export function quoteMailto() {
-  const subject = encodeURIComponent(quoteSubject);
-  const body = encodeURIComponent(
-    "Bonjour,\n\nJe souhaite un devis pour une consultation (bilan ou suivi, en visioconférence ou en déplacement).\n\nJe n’indique pas d’information de santé dans ce message.\n",
-  );
-  const to = isRealEmail(site.email) ? site.email : "";
-  return `mailto:${to}?subject=${subject}&body=${body}`;
 }
 
 export function buildVCard() {
@@ -94,7 +85,7 @@ export function buildVCard() {
   if (isRealPhone(site.phoneTel)) lines.push(`TEL;TYPE=CELL:${site.phoneTel}`);
   if (isRealEmail(site.email)) lines.push(`EMAIL;TYPE=INTERNET:${site.email}`);
   lines.push(
-    "NOTE:Diététicien-nutritionniste. Consultations en visioconférence et en déplacement, secteur de Condrieu.",
+    `NOTE:${site.practiceLine}`,
   );
   lines.push("END:VCARD");
   return lines.join("\r\n");
@@ -104,8 +95,8 @@ export type Offer = {
   id: string;
   group: string;
   name: string;
-  description: string;
   modality: string;
+  duration: string;
   href: string;
   label: string;
 };
@@ -115,9 +106,8 @@ export const offers: Offer[] = [
     id: "bilan-visio",
     group: "Bilan initial",
     name: "Visioconférence",
-    description:
-      "Premier échange à distance : situation, habitudes, mode de vie, besoins et objectifs. Les repères proposés restent à ajuster ensuite.",
     modality: "Visioconférence",
+    duration: site.durationInitial,
     href: site.booking.bilanVisio,
     label: "Prendre rendez-vous : bilan initial en visioconférence",
   },
@@ -125,9 +115,8 @@ export const offers: Offer[] = [
     id: "bilan-deplacement",
     group: "Bilan initial",
     name: "Déplacement",
-    description:
-      "Même bilan, au lieu convenu dans le secteur de Condrieu. Le périmètre du déplacement est précisé avant la confirmation.",
     modality: "Déplacement",
+    duration: site.durationInitial,
     href: site.booking.bilanDeplacement,
     label: "Prendre rendez-vous : bilan initial en déplacement",
   },
@@ -135,9 +124,8 @@ export const offers: Offer[] = [
     id: "suivi-visio",
     group: "Consultation de suivi",
     name: "Visioconférence",
-    description:
-      "Point sur ce qui a pu être mis en place, et ajustement des repères. Le rythme du suivi se décide ensemble.",
     modality: "Visioconférence",
+    duration: site.durationFollowUp,
     href: site.booking.suiviVisio,
     label: "Prendre rendez-vous : suivi en visioconférence",
   },
@@ -145,9 +133,8 @@ export const offers: Offer[] = [
     id: "suivi-deplacement",
     group: "Consultation de suivi",
     name: "Déplacement",
-    description:
-      "Suivi sur place, dans le secteur de Condrieu. Le lieu est convenu avant le rendez-vous.",
     modality: "Déplacement",
+    duration: site.durationFollowUp,
     href: site.booking.suiviDeplacement,
     label: "Prendre rendez-vous : suivi en déplacement",
   },

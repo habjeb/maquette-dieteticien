@@ -25,7 +25,7 @@ export const pages: PageMeta[] = [
     path: "/",
     title: "Nicolas Boyer, diététicien-nutritionniste libéral à Condrieu",
     description:
-      "Diététicien à Condrieu : consultations en visio et en déplacement. Habitudes alimentaires, nutrition et sport, avec Nicolas Boyer, sans promesse de résultat.",
+      "Exercice libéral : visio partout en France, déplacement dans le secteur de Condrieu. Habitudes alimentaires, nutrition et sport, avec Nicolas Boyer.",
     image: "photos/hero.webp",
     imageAlt:
       "Assiette de quinoa et de légumes, entourée de produits frais sur un plan de travail clair.",
@@ -55,7 +55,7 @@ export const pages: PageMeta[] = [
     path: "/cgv",
     title: "Conditions générales de vente | Nicolas Boyer, diététicien",
     description:
-      "Conditions des consultations de Nicolas Boyer, diététicien-nutritionniste à Condrieu : réservation, devis et annulation. Le tarif est communiqué avant la prestation.",
+      "Conditions des consultations de Nicolas Boyer : visio en France, déplacement à Condrieu. Réservation, annulation sous 24 h, tarif communiqué avant la prestation.",
     image: "photos/hero.webp",
     imageAlt:
       "Assiette de quinoa et de légumes, entourée de produits frais sur un plan de travail clair.",
@@ -75,7 +75,7 @@ export const pages: PageMeta[] = [
     path: "/carte",
     title: "Carte de visite | Nicolas Boyer, diététicien-nutritionniste",
     description:
-      "Carte de visite digitale de Nicolas Boyer, diététicien-nutritionniste : visio et déplacement dans le secteur de Condrieu, prise de rendez-vous en ligne.",
+      "Carte de visite de Nicolas Boyer, diététicien-nutritionniste. Visio partout en France et déplacement dans le secteur de Condrieu, rendez-vous en ligne.",
     image: "photos/portrait.webp",
     imageAlt: "Nicolas Boyer, diététicien-nutritionniste",
   },
@@ -84,7 +84,7 @@ export const pages: PageMeta[] = [
     path: "/equilibre-alimentaire",
     title: "Équilibre alimentaire | Nicolas Boyer, diététicien",
     description:
-      "Habitudes alimentaires, repas et organisation avec Nicolas Boyer, diététicien à Condrieu. Un équilibre tenable, sans modèle imposé et sans promesse de résultat.",
+      "Repères pour équilibrer et organiser les repas selon votre rythme, avec Nicolas Boyer. Visio partout en France, déplacement dans le secteur de Condrieu.",
     image: "photos/equilibre.webp",
     imageAlt: "Assiette de riz, de courgettes et d’œufs sur une vaisselle vert sauge, posée sur un linge rayé.",
   },
@@ -93,7 +93,7 @@ export const pages: PageMeta[] = [
     path: "/pathologies-nutrition-therapeutique",
     title: "Nutrition thérapeutique | Nicolas Boyer, diététicien",
     description:
-      "Nutrition thérapeutique avec Nicolas Boyer, diététicien à Condrieu. L’accompagnement complète le suivi médical, sans diagnostic ni promesse de résultat.",
+      "Nutrition thérapeutique avec Nicolas Boyer : adapter l’alimentation à votre état de santé. Visio partout en France, déplacement dans le secteur de Condrieu.",
     image: "photos/consultation.webp",
     imageAlt: "Deux personnes en conversation, assises à une table claire près d’une grande fenêtre.",
   },
@@ -102,7 +102,7 @@ export const pages: PageMeta[] = [
     path: "/nutrition-sportive",
     title: "Nutrition sportive | Nicolas Boyer, diététicien libéral",
     description:
-      "Nutrition sportive avec Nicolas Boyer, diététicien à Condrieu : alimentation, entraînement et récupération, en loisir ou structuré, sans promesse de performance.",
+      "Repas et hydratation autour de l’entraînement, avec Nicolas Boyer. Visio partout en France, déplacement dans le secteur de Condrieu, sans promesse de résultat.",
     image: "photos/sport.webp",
     imageAlt: "Coureur en veste sombre, vu de loin, sur une route dégagée sous un ciel clair.",
   },

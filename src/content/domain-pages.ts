@@ -48,7 +48,7 @@ export const domainBodies: Record<DomainId, DomainBody> = {
     objectives:
       "Il s’agit de traduire une situation de santé en habitudes compréhensibles, compatibles avec ce qui est déjà en place : traitements, rendez-vous, vie quotidienne. L’accompagnement ne promet pas d’évolution clinique.",
     course:
-      "Le premier échange permet de comprendre le contexte. Vous pouvez apporter les documents remis par votre médecin, sans que ce soit une condition. Aucune information de santé n’est demandée sur ce site, ni dans le message de devis, ni dans le formulaire de réservation.",
+      "Le premier échange permet de comprendre le contexte. Vous pouvez apporter les documents remis par votre médecin, sans que ce soit une condition. Aucune information de santé n’est demandée sur ce site, ni dans le formulaire de réservation.",
     situations: [
       "Un traitement qui modifie l’appétit, le goût ou les horaires des repas.",
       "Une recommandation médicale déjà donnée, à rendre praticable au quotidien.",
@@ -70,8 +70,8 @@ export const domainBodies: Record<DomainId, DomainBody> = {
       },
       {
         id: "ecrit",
-        q: "Que faut-il éviter d’écrire en réservant ou en demandant un devis ?",
-        a: "N’indiquez pas de motif de santé, de symptôme ni de traitement. Ces éléments se voient en consultation. Le message de devis et le formulaire de rendez-vous se limitent à l’organisation.",
+        q: "Que faut-il éviter d’écrire en réservant ?",
+        a: "N’indiquez pas de motif de santé, de symptôme ni de traitement. Ces éléments se voient en consultation. Le formulaire de rendez-vous se limite à l’organisation.",
       },
     ],
   },
