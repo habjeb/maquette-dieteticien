@@ -1,6 +1,7 @@
 /**
  * Identité, coordonnées et données factuelles.
- * Remplacez les valeurs entre crochets, les montants « XX € » et les URL Calendly.
+ * Remplacez les valeurs entre crochets et les URL Calendly.
+ * Aucun tarif n’est publié : le montant est communiqué avant la consultation ou sur devis.
  * Ne pas y inscrire de donnée inventée : tant qu’une valeur est un placeholder,
  * elle n’est pas publiée dans les données structurées (téléphone, e-mail, adresse).
  */
@@ -30,10 +31,7 @@ export const site = {
   videoTool: "[Outil de visio à compléter]",
   cancelDelay: "[Délai d’annulation à compléter]",
   paymentMethods: "[Moyens de paiement à compléter]",
-  price: "XX €",
   duration: "[Durée à compléter]",
-  travelFee: "[Frais de déplacement à compléter]",
-  otherFees: "[Autres frais éventuels à compléter]",
   googleBusinessUrl: "",
 
   mediatorName: "[Nom du médiateur de la consommation à compléter]",
@@ -62,12 +60,26 @@ export const site = {
     "Aucune donnée de santé n’est demandée lors de la prise de rendez-vous.",
 } as const;
 
+export const tariffSentence =
+  "Le tarif est communiqué avant la consultation, lors de la prise de rendez-vous ou sur devis.";
+
+export const quoteSubject = "Demande de devis — consultation de diététique";
+
 export function isRealPhone(value: string) {
   return /^\+[1-9]\d{8,14}$/.test(value);
 }
 
 export function isRealEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+export function quoteMailto() {
+  const subject = encodeURIComponent(quoteSubject);
+  const body = encodeURIComponent(
+    "Bonjour,\n\nJe souhaite un devis pour une consultation (bilan ou suivi, en visioconférence ou en déplacement).\n\nJe n’indique pas d’information de santé dans ce message.\n",
+  );
+  const to = isRealEmail(site.email) ? site.email : "";
+  return `mailto:${to}?subject=${subject}&body=${body}`;
 }
 
 export function buildVCard() {
@@ -94,7 +106,6 @@ export type Offer = {
   name: string;
   description: string;
   modality: string;
-  extra: string;
   href: string;
   label: string;
 };
@@ -107,7 +118,6 @@ export const offers: Offer[] = [
     description:
       "Premier échange à distance : situation, habitudes, mode de vie, besoins et objectifs. Les repères proposés restent à ajuster ensuite.",
     modality: "Visioconférence",
-    extra: "Pas de frais de déplacement.",
     href: site.booking.bilanVisio,
     label: "Prendre rendez-vous : bilan initial en visioconférence",
   },
@@ -116,9 +126,8 @@ export const offers: Offer[] = [
     group: "Bilan initial",
     name: "Déplacement",
     description:
-      "Même bilan, au lieu convenu dans le secteur de Condrieu. Le périmètre exact et les frais de route sont annoncés avant la confirmation.",
+      "Même bilan, au lieu convenu dans le secteur de Condrieu. Le périmètre du déplacement est précisé avant la confirmation.",
     modality: "Déplacement",
-    extra: `Frais de déplacement : ${site.travelFee}. Annoncés avant la confirmation.`,
     href: site.booking.bilanDeplacement,
     label: "Prendre rendez-vous : bilan initial en déplacement",
   },
@@ -129,7 +138,6 @@ export const offers: Offer[] = [
     description:
       "Point sur ce qui a pu être mis en place, et ajustement des repères. Le rythme du suivi se décide ensemble.",
     modality: "Visioconférence",
-    extra: "Pas de frais de déplacement.",
     href: site.booking.suiviVisio,
     label: "Prendre rendez-vous : suivi en visioconférence",
   },
@@ -138,9 +146,8 @@ export const offers: Offer[] = [
     group: "Consultation de suivi",
     name: "Déplacement",
     description:
-      "Suivi sur place, dans le secteur de Condrieu. Tout frais supplémentaire est indiqué avant le rendez-vous.",
+      "Suivi sur place, dans le secteur de Condrieu. Le lieu est convenu avant le rendez-vous.",
     modality: "Déplacement",
-    extra: `Frais de déplacement : ${site.travelFee}. ${site.otherFees}.`,
     href: site.booking.suiviDeplacement,
     label: "Prendre rendez-vous : suivi en déplacement",
   },

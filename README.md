@@ -1,6 +1,6 @@
 # Maquette — Nicolas Boyer, diététicien-nutritionniste
 
-Site vitrine one-page, prêt à présenter. Consultations en visioconférence et en déplacement dans le secteur de Condrieu. Application [Vite](https://vite.dev) + React + TypeScript. Les polices (DM Serif Display, Manrope) sont auto-hébergées via Fontsource : aucun script tiers.
+Site vitrine, prêt à présenter. Consultations en visioconférence et en déplacement dans le secteur de Condrieu. Application [Vite](https://vite.dev) + React + TypeScript. Les polices (DM Serif Display, Manrope) sont auto-hébergées via Fontsource : aucun script tiers. Aucun tarif n’est publié.
 
 ## Site en ligne
 
@@ -23,17 +23,17 @@ Le serveur de développement sert l’application sous [http://127.0.0.1:5173/ma
 
 ## Personnaliser
 
-Tout ce qui est factuel est dans `src/lib/site.ts` : nom, téléphone, e-mail, adresse, SIREN, RPPS, diplôme, tarifs, liens Calendly, médiateur. Tant que le téléphone, l’e-mail ou l’adresse restent des placeholders, ils ne sont pas repris dans les données structurées.
+Tout ce qui est factuel est dans `src/lib/site.ts` : nom, téléphone, e-mail, adresse, SIREN, RPPS, diplôme, durée indicative, liens Calendly, médiateur. Tant que le téléphone, l’e-mail ou l’adresse restent des placeholders, ils ne sont pas repris dans les données structurées. Le tarif n’a pas de champ : il est communiqué avant la consultation, lors de la prise de rendez-vous ou sur devis.
 
-Les textes de la page d’accueil (domaines, méthode, FAQ) sont dans `src/content/editorial.ts`. Les titres SEO sont dans `src/content/pages.ts`.
+Les textes de la page d’accueil (domaines, méthode, FAQ) sont dans `src/content/editorial.ts`. Le contenu des trois pages d’accompagnement est dans `src/content/domain-pages.ts`. Les titres SEO sont dans `src/content/pages.ts`.
 
 ## Prise de rendez-vous
 
-Les boutons « Prendre rendez-vous » sont des liens externes (`target="_blank"`, `rel="noopener noreferrer"`) vers les URL Calendly de `site.booking`. Aucun widget, aucun script et aucun traceur Calendly n’est chargé sur le site. Une mention indique qu’aucune donnée de santé n’est demandée à cette étape.
+Les boutons « Prendre rendez-vous » sont des liens externes (`target="_blank"`, `rel="noopener noreferrer"`) vers les URL Calendly de `site.booking`. « Demander un devis » ouvre un `mailto:` (objet prérempli, sans donnée de santé) et n’enregistre rien sur le site. Aucun widget, aucun script et aucun traceur Calendly n’est chargé. Une mention indique qu’aucune donnée de santé n’est demandée à cette étape.
 
 ## Photos
 
-Il n’y a pas encore de photos du client. Les visuels sont des fichiers Pexels, licence [Pexels](https://www.pexels.com/license/) (usage libre, y compris commercial, attribution non obligatoire). Ils sont dans `public/photos/`, en WebP, et **doivent être remplacés**.
+Les visuels d’ambiance sont des fichiers Pexels, licence [Pexels](https://www.pexels.com/license/) (usage libre, y compris commercial, attribution non obligatoire). Ils sont dans `public/photos/`, en WebP, et restent à remplacer par des photos du cabinet. Le portrait est la photo fournie par Nicolas Boyer.
 
 | Fichier | Sujet | Source |
 | --- | --- | --- |
@@ -41,7 +41,7 @@ Il n’y a pas encore de photos du client. Les visuels sont des fichiers Pexels,
 | `equilibre.webp` | Repas composé, assiette sauge | [Pexels 1410235](https://www.pexels.com/photo/1410235/) |
 | `consultation.webp` | Conversation près d’une fenêtre | [Pexels 1181715](https://www.pexels.com/photo/1181715/) |
 | `sport.webp` | Course à pied, de loin | [Pexels 2803158](https://www.pexels.com/photo/2803158/) |
-| `portrait.webp` | Portrait d’illustration | [Pexels 614810](https://www.pexels.com/photo/614810/) |
+| `portrait.webp` | Nicolas Boyer | Photo fournie par le client (selfie, 632×634, sans recadrage). `portrait-320.webp` est la même image à 316 px, servie sur les écrans 1×. |
 | `saone.webp` | Quais de la Saône, à Lyon | [Pexels 12884339](https://www.pexels.com/photo/buildings-along-the-river-in-quais-de-saone-lyon-france-12884339/) |
 
 La recherche Pexels « Lyon hôpital » a servi de point de départ pour le cadre santé. Les premiers résultats mêlent la gare de Lyon et des scènes cliniques (blouses, couloirs, matériel). Elles ont été écartées : le rendu demandé est lumineux, sans blouse stéréotypée ni image anxiogène. La carte « Pathologies » utilise donc une conversation dans une pièce claire. La photo des quais est une illustration de la vallée, pas le lieu de consultation, et ne signifie pas que le cabinet est à Lyon.
@@ -52,7 +52,10 @@ La recherche Pexels « Lyon hôpital » a servi de point de départ pour le cadr
 
 ## Pages
 
-- `/` — accueil (ancres : Accueil, Accompagnements, À propos, Méthode, Tarifs, FAQ, rendez-vous)
+- `/` — accueil (ancres : Accueil, Accompagnements, À propos, Méthode, Consultations, FAQ, rendez-vous)
+- `/equilibre-alimentaire/`
+- `/pathologies-nutrition-therapeutique/`
+- `/nutrition-sportive/`
 - `/mentions-legales/`
 - `/politique-de-confidentialite/`
 - `/cgv/`

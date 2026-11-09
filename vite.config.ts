@@ -53,6 +53,9 @@ function seoPlugin(pages: HeadPage[]): Plugin {
   if (/"telephone"\s*:/.test(rawLd) || /"email"\s*:/.test(rawLd) || /streetAddress/.test(rawLd)) {
     throw new Error("Le JSON-LD ne doit pas contenir de téléphone, d’e-mail ou d’adresse tant qu’ils ne sont pas réels.");
   }
+  if (/"priceRange"\s*:/.test(rawLd) || /"price"\s*:/.test(rawLd) || /"offers"\s*:/.test(rawLd)) {
+    throw new Error("Le JSON-LD ne doit pas publier de tarif ni d’offre chiffrée.");
+  }
 
   return {
     name: "seo-routes",

@@ -30,11 +30,20 @@ export function Footer() {
           </p>
         </div>
         <div>
-          <p className="footer-label">Sur cette page</p>
+          <p className="footer-label">Navigation</p>
           <ul>
             {NAV.map((item) => (
               <li key={item.id}>
                 <A href={item.href}>{item.label}</A>
+                {item.children ? (
+                  <ul>
+                    {item.children.map((child) => (
+                      <li key={child.id}>
+                        <A href={child.href}>{child.label}</A>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -68,8 +77,8 @@ export function Footer() {
       </div>
       <div className="container footer-bottom">
         <p>
-          Maquette de présentation. Les éléments entre crochets, les montants « {site.price} » et les liens Calendly sont
-          à remplacer. Hébergement de la maquette : {site.host.name}.
+          Maquette de présentation. Les éléments entre crochets et les liens Calendly sont à remplacer. Aucun tarif
+          n’est publié. Hébergement de la maquette : {site.host.name}.
         </p>
         <p>© 2026 {site.fullName}</p>
       </div>

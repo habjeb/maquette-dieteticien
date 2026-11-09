@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BookLink } from "../components/ui";
+import { BookLink, Photo } from "../components/ui";
+import { photos } from "../content/editorial";
 import { sitePath } from "../lib/paths";
 import { buildVCard, isRealEmail, isRealPhone, site } from "../lib/site";
 import { A } from "../router";
@@ -18,7 +19,11 @@ export function Crumbs({ current }: { current: string }) {
   );
 }
 
-export function LegalPage({ id }: { id: Exclude<PageId, "home" | "carte" | "not-found"> }) {
+export function LegalPage({
+  id,
+}: {
+  id: Exclude<PageId, "home" | "carte" | "not-found" | "equilibre" | "pathologies" | "sport">;
+}) {
   const page = pages[id];
   return (
     <article className="section legal">
@@ -86,9 +91,10 @@ const pages = {
         </p>
         <h2>Propriété intellectuelle</h2>
         <p>
-          Les textes de présentation sont destinés à ce site. Les photographies sont des illustrations libres de droits,
-          temporairement utilisées pour la maquette, et seront remplacées. Toute reproduction non autorisée des contenus
-          propres à l’éditeur peut être interdite dès lors que le site n’est plus une maquette.
+          Les textes de présentation sont destinés à ce site. Le portrait est une photographie de Nicolas Boyer. Les
+          autres photographies sont des illustrations libres de droits, temporairement utilisées pour la maquette, et
+          seront remplacées. Toute reproduction non autorisée des contenus propres à l’éditeur peut être interdite dès
+          lors que le site n’est plus une maquette.
         </p>
         <p>Cette page est un texte de maquette. Elle doit être relue avant publication définitive.</p>
       </>
@@ -143,7 +149,7 @@ const pages = {
   cgv: {
     crumb: "Conditions générales de vente",
     title: "Conditions générales de vente",
-    intro: "Cadre d’information pour les consultations. Les montants, délais et modalités marqués entre crochets sont à compléter.",
+    intro: "Cadre d’information pour les consultations. Les délais et modalités marqués entre crochets sont à compléter.",
     body: (
       <>
         <h2>Prestations</h2>
@@ -152,11 +158,10 @@ const pages = {
           visioconférence ou en déplacement dans le secteur de {site.area}. Il s’agit d’un accompagnement
           individualisé, sans promesse de résultat et sans se substituer à un suivi médical.
         </p>
-        <h2>Tarifs</h2>
+        <h2>Tarif</h2>
         <p>
-          Les tarifs affichés sur la page d’accueil sont ceux de la maquette ({site.price}) et seront remplacés par les
-          montants réels. TVA : {site.vat}. Tout frais supplémentaire, notamment {site.travelFee}, est annoncé avant la
-          confirmation.
+          Le tarif est communiqué et accepté avant la prestation, lors de la prise de rendez-vous ou sur devis. Aucune
+          grille tarifaire n’est publiée sur ce site. TVA : {site.vat}.
         </p>
         <h2>Réservation</h2>
         <p>
@@ -166,12 +171,12 @@ const pages = {
         <h2>Annulation et report</h2>
         <p>
           Le message de confirmation contient un lien pour modifier ou annuler. Délai : {site.cancelDelay}. Les
-          conséquences d’une annulation tardive seront précisées ici : [Retenue éventuelle à compléter].
+          conditions d’une annulation tardive sont précisées avant la confirmation du rendez-vous.
         </p>
         <h2>Paiement</h2>
         <p>
-          Moyens acceptés : {site.paymentMethods}. Le règlement ne passe pas par ce site. Il est précisé avant le
-          rendez-vous.
+          Moyens acceptés : {site.paymentMethods}. Le règlement ne passe pas par ce site. Le montant et les modalités sont
+          précisés avant le rendez-vous, ou sur devis. Aucun montant n’est publié ici.
         </p>
         <h2>Droit de rétractation</h2>
         <p>
@@ -242,9 +247,7 @@ export function CartePage() {
       <div className="container carte">
         <Crumbs current="Carte de visite" />
         <div className="carte-card">
-          <p className="brand-mark" aria-hidden="true">
-            NB
-          </p>
+          <Photo {...photos.portrait} sizes="148px" className="carte-portrait" />
           <h1>{site.fullName}</h1>
           <p className="carte-role">{site.jobTitle}</p>
           <p>Visio et déplacement · secteur de {site.area}</p>

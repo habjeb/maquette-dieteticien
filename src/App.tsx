@@ -1,6 +1,7 @@
 import { BookBar } from "./layout/BookBar";
 import { Footer } from "./layout/Footer";
 import { Header } from "./layout/Header";
+import { DomainPage } from "./pages/DomainPage";
 import { CartePage, LegalPage, NotFoundPage } from "./pages/Subpages";
 import { Seo, usePage } from "./components/ui";
 import { HomePage } from "./sections/Home";
@@ -29,6 +30,7 @@ function Frame() {
           <LegalPage id={page.id} />
         ) : null}
         {page.id === "carte" ? <CartePage /> : null}
+        {page.id === "equilibre" || page.id === "pathologies" || page.id === "sport" ? <DomainPage id={page.id} /> : null}
         {page.id === "not-found" ? <NotFoundPage /> : null}
       </main>
       <Footer />
