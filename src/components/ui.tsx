@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { pageByPath, type PageMeta } from "../content/pages";
 import { publicAsset } from "../lib/paths";
-import { site } from "../lib/site";
+import { quoteMailto, site } from "../lib/site";
 import { useRoute } from "../router";
 
 export function Seo({ page }: { page: PageMeta }) {
@@ -38,11 +38,23 @@ export function usePage(): PageMeta {
   return pageByPath(path);
 }
 
+function resolveSrcSet(srcSet: string) {
+  return srcSet
+    .split(",")
+    .map((part) => {
+      const [url, descriptor] = part.trim().split(/\s+/);
+      return descriptor ? `${publicAsset(url)} ${descriptor}` : publicAsset(url);
+    })
+    .join(", ");
+}
+
 export function Photo({
   src,
   alt,
   width,
   height,
+  srcSet,
+  sizes,
   priority = false,
   className,
 }: {
@@ -50,6 +62,8 @@ export function Photo({
   alt: string;
   width: number;
   height: number;
+  srcSet?: string;
+  sizes?: string;
   priority?: boolean;
   className?: string;
 }) {
@@ -57,6 +71,8 @@ export function Photo({
     <img
       className={className}
       src={publicAsset(src)}
+      srcSet={srcSet ? resolveSrcSet(srcSet) : undefined}
+      sizes={srcSet ? sizes : undefined}
       alt={alt}
       width={width}
       height={height}
@@ -82,6 +98,22 @@ export function PrivacyNote({ id }: { id?: string }) {
     <p className="privacy-note" id={id}>
       {site.privacyNote} Le formulaire se limite à l’identité, aux coordonnées, au type de rendez-vous et au créneau.
     </p>
+  );
+}
+
+export function QuoteLink({
+  label = "Demander un devis",
+  children,
+  className = "btn btn-secondary",
+}: {
+  label?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <a className={className} href={quoteMailto()} aria-label={label}>
+      {children}
+    </a>
   );
 }
 

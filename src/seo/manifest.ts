@@ -58,6 +58,7 @@ function person() {
     "@type": "Person",
     name: site.fullName,
     jobTitle: site.jobTitle,
+    image: imageUrl("photos/portrait.webp"),
     url: absolute("/carte"),
     workLocation: { "@type": "City", name: site.area },
   };

@@ -1,8 +1,8 @@
-import { useId, useState } from "react";
-import { BookLink, Photo, PrivacyNote, SectionHead } from "../components/ui";
+import { FaqList } from "../components/FaqList";
+import { BookLink, Photo, PrivacyNote, QuoteLink, SectionHead } from "../components/ui";
 import { domains, faq, heroText, photos, steps } from "../content/editorial";
 import { sitePath } from "../lib/paths";
-import { offers, site } from "../lib/site";
+import { offers, site, tariffSentence } from "../lib/site";
 import { A } from "../router";
 
 export function HomePage() {
@@ -13,7 +13,7 @@ export function HomePage() {
       <Presentation />
       <Lieu />
       <Methode />
-      <Tarifs />
+      <Consultations />
       <Faq />
       <Reservation />
     </>
@@ -65,20 +65,13 @@ function Domaines() {
               </figure>
               <div className="domain-body">
                 <p className="kicker">0{index + 1}</p>
-                <h3>{domain.title}</h3>
+                <h3>
+                  <A href={sitePath(domain.path)}>{domain.title}</A>
+                </h3>
                 <p>{domain.summary}</p>
-                <details className="detail">
-                  <summary>
-                    <span className="when-closed">Lire le détail</span>
-                    <span className="when-open">Replier le détail</span>
-                  </summary>
-                  <p>{domain.detail}</p>
-                  <ul className="edit-list">
-                    {domain.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </details>
+                <A className="more" href={sitePath(domain.path)}>
+                  Voir l’accompagnement
+                </A>
               </div>
             </article>
           ))}
@@ -94,7 +87,6 @@ function Presentation() {
       <div className="container about-grid">
         <figure className="portrait">
           <Photo {...photos.portrait} />
-          <figcaption>Photo d’illustration — sera remplacée par le portrait de Nicolas Boyer.</figcaption>
         </figure>
         <div>
           <SectionHead
@@ -169,47 +161,45 @@ function Methode() {
   );
 }
 
-function Tarifs() {
+function Consultations() {
   return (
-    <section className="section section-sage" id="tarifs">
+    <section className="section section-sage" id="consultations">
       <div className="container">
         <SectionHead
           index="05"
-          title="Consultations et tarifs"
-          intro={`Les montants affichés (${site.price}) et les durées sont des emplacements à compléter. Tout frais supplémentaire est annoncé avant la confirmation du rendez-vous.`}
+          title="Modalités de consultation"
+          intro={`${tariffSentence} Les durées indiquées restent à préciser.`}
         />
-        <div className="price-grid" data-booking-visible>
+        <div className="consult-grid" data-booking-visible>
           {offers.map((offer) => (
-            <article className="price-card" key={offer.id} id={offer.id}>
+            <article className="consult-card" key={offer.id} id={offer.id}>
               <p className="kicker">{offer.group}</p>
               <h3>{offer.name}</h3>
               <p>{offer.description}</p>
               <dl>
                 <div>
-                  <dt>Durée</dt>
+                  <dt>Durée indicative</dt>
                   <dd>{site.duration}</dd>
-                </div>
-                <div>
-                  <dt>Tarif</dt>
-                  <dd className="price-amount">{site.price}</dd>
                 </div>
                 <div>
                   <dt>Modalité</dt>
                   <dd>{offer.modality}</dd>
                 </div>
-                <div>
-                  <dt>Frais supplémentaires</dt>
-                  <dd>{offer.extra}</dd>
-                </div>
               </dl>
-              <BookLink href={offer.href} label={offer.label}>
-                Prendre rendez-vous
-              </BookLink>
+              <div className="consult-actions">
+                <BookLink href={offer.href} label={offer.label}>
+                  Prendre rendez-vous
+                </BookLink>
+                <QuoteLink label={`Demander un devis : ${offer.group}, ${offer.name}`}>
+                  Demander un devis
+                </QuoteLink>
+              </div>
             </article>
           ))}
         </div>
-        <p className="price-note">
-          Moyens de paiement : {site.paymentMethods}. Aucun paiement n’est encaissé sur ce site.
+        <p className="consult-note">
+          « Demander un devis » ouvre un message dans votre messagerie. Rien n’est enregistré sur ce site. Destinataire :{" "}
+          {site.email}. Moyens de paiement : {site.paymentMethods}. Aucun paiement n’est encaissé ici.
         </p>
         <PrivacyNote />
       </div>
@@ -218,8 +208,6 @@ function Tarifs() {
 }
 
 function Faq() {
-  const [open, setOpen] = useState<string | null>(null);
-  const baseId = useId();
   return (
     <section className="section" id="faq">
       <div className="container faq-layout">
@@ -228,42 +216,7 @@ function Faq() {
           title="Questions fréquentes"
           intro="Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire."
         />
-        <div className="faq-list">
-          {faq.map((item) => {
-            const expanded = open === item.id;
-            const panelId = `${baseId}-${item.id}`;
-            const buttonId = `${panelId}-button`;
-            return (
-              <article className={`faq-item${expanded ? " is-open" : ""}`} key={item.id}>
-                <h3>
-                  <button
-                    type="button"
-                    id={buttonId}
-                    aria-expanded={expanded}
-                    aria-controls={panelId}
-                    onClick={() => setOpen(expanded ? null : item.id)}
-                  >
-                    <span>{item.q}</span>
-                    <span className="faq-symbol" aria-hidden="true">
-                      {expanded ? "–" : "+"}
-                    </span>
-                  </button>
-                </h3>
-                <div
-                  className="faq-panel"
-                  id={panelId}
-                  role="region"
-                  aria-labelledby={buttonId}
-                  inert={expanded ? undefined : true}
-                >
-                  <div className="faq-panel-inner">
-                    <p>{item.a}</p>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+        <FaqList items={faq} />
       </div>
     </section>
   );
@@ -277,7 +230,7 @@ function Reservation() {
         <h2>Choisir un créneau</h2>
         <p>
           Quatre liens, selon qu’il s’agit d’un bilan ou d’un suivi, en visio ou en déplacement. Ils ouvrent la page de
-          réservation dans un nouvel onglet. Aucun widget n’est chargé sur ce site.
+          réservation dans un nouvel onglet. {tariffSentence}
         </p>
         <div className="band-actions">
           {offers.map((offer) => (
@@ -285,6 +238,9 @@ function Reservation() {
               {offer.group} — {offer.name}
             </BookLink>
           ))}
+          <QuoteLink label="Demander un devis" className="btn btn-light">
+            Demander un devis
+          </QuoteLink>
         </div>
         <PrivacyNote />
       </div>

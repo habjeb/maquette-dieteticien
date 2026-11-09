@@ -32,9 +32,11 @@ export const photos = {
   },
   portrait: {
     src: "photos/portrait.webp",
-    width: 1100,
-    height: 940,
-    alt: "Portrait d’illustration d’un homme au regard calme. À remplacer par la photo de Nicolas Boyer.",
+    srcSet: "photos/portrait-320.webp 316w, photos/portrait.webp 632w",
+    sizes: "210px",
+    width: 632,
+    height: 634,
+    alt: "Nicolas Boyer, diététicien-nutritionniste",
   },
   saone: {
     src: "photos/saone.webp",
@@ -47,50 +49,31 @@ export const photos = {
 export const domains = [
   {
     id: "equilibre",
+    path: "/equilibre-alimentaire",
     title: "Équilibre alimentaire",
     photo: photos.equilibre,
     summary:
       "Améliorer les habitudes alimentaires, organiser les repas et, si cela fait partie de votre demande, parler du poids. L’objectif est un rythme tenable, pas un modèle imposé.",
-    detail:
-      "Il peut s’agir de repas plus réguliers, de courses plus simples, ou d’une autre façon de composer l’assiette. La gestion du poids, lorsqu’elle est souhaitée, se discute à partir de votre situation : elle n’est ni un préalable, ni une promesse.",
-    points: [
-      "Habitudes alimentaires",
-      "Organisation des repas",
-      "Gestion du poids, seulement si vous le souhaitez",
-      "Une alimentation que l’on peut tenir dans la durée",
-    ],
   },
   {
     id: "pathologies",
+    path: "/pathologies-nutrition-therapeutique",
     title: "Pathologies et nutrition thérapeutique",
     photo: photos.consultation,
     summary:
       "Prise en charge nutritionnelle individualisée, adaptée à la situation et aux recommandations applicables. Le diététicien ne pose pas de diagnostic et ne remplace pas le médecin.",
-    detail:
-      "Vous pouvez consulter lorsqu’une maladie, un traitement ou un symptôme appelle des adaptations alimentaires, dans le champ de compétence du diététicien. Rien de tout cela n’est demandé sur ce site : l’échange a lieu pendant la consultation.",
-    points: [
-      "Situation personnelle, sans schéma unique",
-      "Repères compatibles avec un suivi médical déjà en cours",
-      "Recommandations expliquées, pas imposées",
-      "Aucun dossier patient conservé sur ce site",
-    ],
   },
   {
     id: "sport",
+    path: "/nutrition-sportive",
     title: "Nutrition sportive",
     photo: photos.sport,
     summary:
       "Alimentation autour de l’entraînement, de la récupération et des échéances, que la pratique soit de loisir ou plus structurée. La performance n’est pas un résultat promis.",
-    detail:
-      "La composition corporelle peut être un repère parmi d’autres. Elle n’est pas une fin en soi. La nutrition sportive est un domaine d’intérêt ; elle ne résume pas une pratique qui reste généraliste.",
-    points: [
-      "Repas autour des séances",
-      "Récupération",
-      "Préparation d’une échéance",
-      "Composition corporelle, si elle est pertinente pour vous",
-    ],
   },
 ] as const;
+
+export type DomainId = (typeof domains)[number]["id"];
 
 export const steps = [
   {
@@ -141,6 +124,6 @@ export const faq = [
   {
     id: "paiement",
     q: "Quels moyens de paiement acceptez-vous ?",
-    a: `Les moyens de paiement seront indiqués ici : ${site.paymentMethods}. Le règlement ne s’effectue pas sur ce site. Les modalités vous sont précisées avant le rendez-vous.`,
+    a: `Le tarif est communiqué avant la consultation, lors de la prise de rendez-vous ou sur devis. Aucun montant n’est affiché sur ce site. Les moyens de paiement seront indiqués ici : ${site.paymentMethods}. Le règlement ne s’effectue pas en ligne.`,
   },
 ] as const;

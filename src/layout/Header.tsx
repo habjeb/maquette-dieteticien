@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useActiveSection } from "../hooks/useActiveSection";
-import { NAV, SECTION_IDS } from "../lib/nav";
-import { sitePath } from "../lib/paths";
+import { NAV, SECTION_IDS, type NavItem } from "../lib/nav";
+import { normalizePath, sitePath } from "../lib/paths";
 import { site } from "../lib/site";
 import { A, useRoute } from "../router";
 import { BookLink } from "../components/ui";
@@ -86,11 +86,15 @@ export function Header() {
           </span>
         </A>
         <nav className="nav-desktop" aria-label="Sections">
-          {NAV.map((item) => (
-            <A key={item.id} href={item.href} aria-current={active === item.id ? "true" : undefined}>
-              {item.label}
-            </A>
-          ))}
+          {NAV.map((item) =>
+            item.children ? (
+              <DomainMenu key={item.id} item={item} path={path} sectionCurrent={active === item.id} />
+            ) : (
+              <A key={item.id} href={item.href} aria-current={active === item.id ? "true" : undefined}>
+                {item.label}
+              </A>
+            ),
+          )}
         </nav>
         <div className="header-tools">
           <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-primary nav-cta">
@@ -143,9 +147,29 @@ export function Header() {
         </div>
         <nav className="menu-links" aria-label="Menu">
           {NAV.map((item) => (
-            <A key={item.id} href={item.href} aria-current={active === item.id ? "true" : undefined} onClick={close}>
-              {item.label}
-            </A>
+            <div key={item.id}>
+              <A
+                href={item.href}
+                aria-current={active === item.id || childCurrent(item, path) ? "true" : undefined}
+                onClick={close}
+              >
+                {item.label}
+              </A>
+              {item.children ? (
+                <div className="menu-sub">
+                  {item.children.map((child) => (
+                    <A
+                      key={child.id}
+                      href={child.href}
+                      aria-current={routeOf(child.href) === path ? "page" : undefined}
+                      onClick={close}
+                    >
+                      {child.label}
+                    </A>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           ))}
         </nav>
         <div className="menu-foot">
@@ -155,6 +179,95 @@ export function Header() {
         </div>
       </div>
     </header>
+  );
+}
+
+function routeOf(href: string) {
+  return normalizePath(href.split("#")[0] || "/");
+}
+
+function childCurrent(item: NavItem, path: string) {
+  return item.children?.some((child) => routeOf(child.href) === path) ?? false;
+}
+
+function DomainMenu({
+  item,
+  path,
+  sectionCurrent,
+}: {
+  item: NavItem;
+  path: string;
+  sectionCurrent: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuId = useId();
+  const onPage = childCurrent(item, path);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setOpen(false);
+      rootRef.current?.querySelector("a")?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  return (
+    <div
+      className={`nav-drop${open ? " is-open" : ""}`}
+      ref={rootRef}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => {
+        if (!rootRef.current?.contains(document.activeElement)) setOpen(false);
+      }}
+      onFocus={(event) => {
+        const target = event.target as Node | null;
+        if (target === buttonRef.current) setOpen(true);
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+      }}
+    >
+      <A href={item.href} aria-current={sectionCurrent || onPage ? "true" : undefined} onClick={() => setOpen(false)}>
+        {item.label}
+      </A>
+      <button
+        ref={buttonRef}
+        type="button"
+        className="nav-more"
+        aria-expanded={open}
+        aria-controls={menuId}
+        aria-label="Domaines d’accompagnement"
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={() => setOpen(true)}
+      >
+        <Chevron open={open} />
+      </button>
+      <div className="nav-sub" id={menuId} role="group" aria-label="Domaines d’accompagnement" hidden={open ? undefined : true}>
+        {item.children?.map((child) => (
+          <A
+            key={child.id}
+            href={child.href}
+            aria-current={routeOf(child.href) === path ? "page" : undefined}
+            onClick={() => setOpen(false)}
+          >
+            {child.label}
+          </A>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" className={open ? "is-open" : undefined}>
+      <path d="M3 5.2l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
   );
 }
 

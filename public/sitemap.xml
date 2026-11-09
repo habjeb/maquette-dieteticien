@@ -6,6 +6,21 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://habjeb.github.io/maquette-dieteticien/equilibre-alimentaire/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://habjeb.github.io/maquette-dieteticien/pathologies-nutrition-therapeutique/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://habjeb.github.io/maquette-dieteticien/nutrition-sportive/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://habjeb.github.io/maquette-dieteticien/mentions-legales/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
