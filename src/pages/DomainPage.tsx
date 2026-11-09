@@ -1,9 +1,9 @@
 import { FaqList } from "../components/FaqList";
-import { BookLink, Photo, QuoteLink } from "../components/ui";
+import { BookLink, Photo } from "../components/ui";
 import { domainBodies } from "../content/domain-pages";
 import { domains, type DomainId } from "../content/editorial";
 import { sitePath } from "../lib/paths";
-import { site, tariffSentence } from "../lib/site";
+import { site } from "../lib/site";
 import { A } from "../router";
 import { Crumbs } from "./Subpages";
 
@@ -26,12 +26,7 @@ export function DomainPage({ id }: { id: DomainId }) {
               <BookLink href={site.booking.general} label={`Prendre rendez-vous — ${domain.title}`}>
                 Prendre rendez-vous
               </BookLink>
-              <QuoteLink label={`Demander un devis — ${domain.title}`}>Demander un devis</QuoteLink>
             </div>
-            <p className="privacy-note">
-              {tariffSentence} Le message de devis s’ouvre dans votre messagerie et n’est pas enregistré sur ce site.
-              Destinataire : {site.email}.
-            </p>
           </div>
           <figure className="domain-hero-media">
             <Photo {...domain.photo} priority />
@@ -64,7 +59,6 @@ export function DomainPage({ id }: { id: DomainId }) {
           <BookLink href={site.booking.general} label={`Prendre rendez-vous — ${domain.title}`}>
             Prendre rendez-vous
           </BookLink>
-          <QuoteLink label={`Demander un devis — ${domain.title}`}>Demander un devis</QuoteLink>
         </div>
 
         <nav className="related" aria-label="Autres accompagnements">

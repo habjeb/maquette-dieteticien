@@ -26,7 +26,7 @@ export function Footer() {
             </span>
           </A>
           <p className="footer-lead">
-            Exercice libéral. Consultations en visioconférence et en déplacement dans le secteur de {site.area}.
+            {site.practiceLine}
           </p>
         </div>
         <div>

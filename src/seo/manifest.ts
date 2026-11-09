@@ -1,5 +1,5 @@
 import { faq, heroText, heroTitle } from "../content/editorial";
-import { pageById, pages, type PageMeta } from "../content/pages";
+import { pages, type PageMeta } from "../content/pages";
 import { site } from "../lib/site";
 
 export type HeadPage = PageMeta & {
@@ -27,15 +27,18 @@ function website() {
   };
 }
 
-function dietitian(description: string) {
+function dietitian() {
   return {
     "@type": "Dietitian",
     "@id": `${site.url}#praticien`,
     name: site.fullName,
-    description,
+    description: site.practiceLine,
     url: site.url,
     image: imageUrl("photos/hero.webp"),
-    areaServed: { "@type": "City", name: site.area },
+    areaServed: [
+      ...site.communes.map((name) => ({ "@type": "City", name })),
+      { "@type": "Country", name: "France" },
+    ],
     availableLanguage: "fr",
     knowsAbout: ["Diététique", "Nutrition", "Nutrition sportive"],
   };
@@ -58,6 +61,7 @@ function person() {
     "@type": "Person",
     name: site.fullName,
     jobTitle: site.jobTitle,
+    description: site.practiceLine,
     image: imageUrl("photos/portrait.webp"),
     url: absolute("/carte"),
     workLocation: { "@type": "City", name: site.area },
@@ -75,11 +79,10 @@ function breadcrumb(page: PageMeta) {
 }
 
 function graphFor(page: PageMeta) {
-  const home = pageById("home");
   if (page.id === "home") {
     return {
       "@context": "https://schema.org",
-      "@graph": [website(), dietitian(home.description), faqPage()],
+      "@graph": [website(), dietitian(), faqPage()],
     };
   }
   if (page.id === "carte") {
@@ -107,7 +110,7 @@ function graphFor(page: PageMeta) {
 
 function noscriptFor(page: PageMeta) {
   if (page.id === "home") {
-    return `<main><h1>${heroTitle}</h1><p>${heroText}</p><p>Secteur de ${site.area}. Consultations en visioconférence et en déplacement.</p><p><a href="${site.booking.general}">Prendre rendez-vous</a></p></main>`;
+    return `<main><h1>${heroTitle}</h1><p>${heroText}</p><p>${site.practiceLine}</p><p><a href="${site.booking.general}">Prendre rendez-vous</a></p></main>`;
   }
   const heading = page.title.split("|")[0]?.trim() ?? page.title;
   return `<main><h1>${heading}</h1><p>${page.description}</p><p><a href="${site.url}">Retour à l’accueil</a></p></main>`;

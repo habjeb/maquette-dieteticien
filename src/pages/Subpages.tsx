@@ -118,9 +118,9 @@ const pages = {
         <h2>Prise de rendez-vous</h2>
         <p>
           Les boutons « Prendre rendez-vous » sont de simples liens vers un service externe de prise de rendez-vous.
-          Aucun module de ce service n’est chargé tant que vous n’ouvrez pas le lien. Les données alors demandées doivent
-          rester limitées à l’identité, aux coordonnées, au type de rendez-vous et au créneau. La politique du service
-          s’applique à partir de cette page :{" "}
+          Aucun module de ce service n’est chargé tant que vous n’ouvrez pas le lien. {site.privacyNote} Les données
+          alors demandées doivent rester limitées à l’identité, aux coordonnées, au type de rendez-vous et au créneau. La
+          politique du service s’applique à partir de cette page :{" "}
           <a href="https://calendly.com/privacy">politique de confidentialité de Calendly</a>.
         </p>
         <h2>Cookies et traceurs</h2>
@@ -154,29 +154,28 @@ const pages = {
       <>
         <h2>Prestations</h2>
         <p>
-          {site.fullName} propose des consultations de diététique et de nutrition, en bilan initial ou en suivi, en
-          visioconférence ou en déplacement dans le secteur de {site.area}. Il s’agit d’un accompagnement
-          individualisé, sans promesse de résultat et sans se substituer à un suivi médical.
+          {site.fullName} propose des consultations de diététique et de nutrition, en bilan initial ou en suivi.{" "}
+          {site.practiceLine} Il s’agit d’un accompagnement individualisé, sans promesse de résultat et sans se
+          substituer à un suivi médical.
         </p>
         <h2>Tarif</h2>
         <p>
-          Le tarif est communiqué et accepté avant la prestation, lors de la prise de rendez-vous ou sur devis. Aucune
-          grille tarifaire n’est publiée sur ce site. TVA : {site.vat}.
+          Le tarif est communiqué et accepté avant la prestation, lors de la prise de rendez-vous. Aucune grille
+          tarifaire n’est publiée sur ce site. TVA : {site.vat}.
         </p>
         <h2>Réservation</h2>
         <p>
           Le rendez-vous est demandé via le lien de réservation. Le créneau n’est tenu pour confirmé qu’après le message
-          de confirmation. Aucune donnée de santé n’est demandée à cette étape.
+          de confirmation.
         </p>
         <h2>Annulation et report</h2>
         <p>
-          Le message de confirmation contient un lien pour modifier ou annuler. Délai : {site.cancelDelay}. Les
-          conditions d’une annulation tardive sont précisées avant la confirmation du rendez-vous.
+          Le message de confirmation contient un lien pour modifier ou annuler. Le délai d’annulation est de{" "}
+          {site.cancelDelay}. Au-delà, prévenez par téléphone en cas d’urgence.
         </p>
         <h2>Paiement</h2>
         <p>
-          Moyens acceptés : {site.paymentMethods}. Le règlement ne passe pas par ce site. Le montant et les modalités sont
-          précisés avant le rendez-vous, ou sur devis. Aucun montant n’est publié ici.
+          Moyens acceptés : {site.paymentMethods}. Le règlement ne se fait pas en ligne. Aucun montant n’est publié ici.
         </p>
         <h2>Droit de rétractation</h2>
         <p>
@@ -250,7 +249,7 @@ export function CartePage() {
           <Photo {...photos.portrait} sizes="148px" className="carte-portrait" />
           <h1>{site.fullName}</h1>
           <p className="carte-role">{site.jobTitle}</p>
-          <p>Visio et déplacement · secteur de {site.area}</p>
+          <p>{site.practiceLine}</p>
           <div className="carte-actions" data-booking-visible>
             {phoneOk ? (
               <a className="btn btn-primary btn-block" href={`tel:${site.phoneTel}`}>
@@ -282,15 +281,10 @@ export function CartePage() {
               ? "Le fichier contact a été préparé. Le téléphone et l’e-mail y seront ajoutés lorsqu’ils seront renseignés."
               : "Le fichier .vcf contient le nom, le titre et le lien de cette page. Téléphone et e-mail y figureront une fois renseignés."}
           </p>
-          <PrivacyLine />
         </div>
       </div>
     </article>
   );
-}
-
-function PrivacyLine() {
-  return <p className="privacy-note">{site.privacyNote}</p>;
 }
 
 export function NotFoundPage() {

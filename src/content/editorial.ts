@@ -53,7 +53,7 @@ export const domains = [
     title: "Équilibre alimentaire",
     photo: photos.equilibre,
     summary:
-      "Améliorer les habitudes alimentaires, organiser les repas et, si cela fait partie de votre demande, parler du poids. L’objectif est un rythme tenable, pas un modèle imposé.",
+      "Trouvez des repères pour équilibrer vos repas et les organiser selon votre rythme de vie. Si le poids fait partie de vos préoccupations, nous pouvons aussi en parler en consultation.",
   },
   {
     id: "pathologies",
@@ -61,7 +61,7 @@ export const domains = [
     title: "Pathologies et nutrition thérapeutique",
     photo: photos.consultation,
     summary:
-      "Prise en charge nutritionnelle individualisée, adaptée à la situation et aux recommandations applicables. Le diététicien ne pose pas de diagnostic et ne remplace pas le médecin.",
+      "Adaptez votre alimentation à votre état de santé. Je vous aide à mettre en pratique les recommandations nutritionnelles liées à votre pathologie, en tenant compte de vos habitudes et de vos contraintes.",
   },
   {
     id: "sport",
@@ -69,7 +69,7 @@ export const domains = [
     title: "Nutrition sportive",
     photo: photos.sport,
     summary:
-      "Alimentation autour de l’entraînement, de la récupération et des échéances, que la pratique soit de loisir ou plus structurée. La performance n’est pas un résultat promis.",
+      "Adaptez vos repas et votre hydratation à vos entraînements pour mieux gérer votre énergie pendant l’effort et soutenir votre récupération, que vous pratiquiez pour le plaisir ou que vous prépariez une compétition.",
   },
 ] as const;
 
@@ -78,15 +78,15 @@ export type DomainId = (typeof domains)[number]["id"];
 export const steps = [
   {
     title: "Bilan initial",
-    text: "Nous faisons le point sur votre situation, vos habitudes, votre mode de vie, vos besoins et vos objectifs. Ce premier échange sert à comprendre le contexte avant toute recommandation.",
+    text: "Nous faisons le point sur vos habitudes alimentaires, votre mode de vie et vos objectifs. Ce premier rendez-vous me permet de comprendre votre situation avant de vous proposer des conseils.",
   },
   {
     title: "Accompagnement personnalisé",
-    text: "Les objectifs sont précisés avec vous. Les recommandations sont adaptées, réalistes et individualisées : elles tiennent compte de ce que vous pouvez mettre en place.",
+    text: "Nous définissons vos priorités et les traduisons en actions concrètes.",
   },
   {
     title: "Suivi et ajustements",
-    text: "Le suivi permet de regarder ce qui évolue, d’ajuster les repères et de poursuivre l’accompagnement dans la durée, au rythme convenu ensemble.",
+    text: "Lors des rendez-vous de suivi, nous revenons sur ce que vous avez essayé, ce qui vous a aidé et les difficultés rencontrées. Nous ajustons les conseils en fonction de votre expérience.",
   },
 ] as const;
 
@@ -109,21 +109,16 @@ export const faq = [
   {
     id: "visio",
     q: "Proposez-vous des consultations en visio ?",
-    a: `Oui. Des consultations en visioconférence sont proposées, ainsi que des rendez-vous en déplacement dans le secteur de ${site.area}. Le lien de connexion est envoyé après la réservation, avec le message de confirmation. L’outil utilisé sera précisé : ${site.videoTool}.`,
+    a: `Oui. Les consultations en visioconférence sont proposées partout en France. Les déplacements concernent le secteur de ${site.area}. Le lien de connexion est envoyé après la réservation, avec le message de confirmation. L’outil utilisé sera précisé : ${site.videoTool}.`,
   },
   {
     id: "communes",
     q: "Dans quelles communes intervenez-vous ?",
-    a: `Les déplacements concernent le secteur de ${site.area}. La liste des communes sera publiée ici : ${site.communes}. Hors de ce secteur, la consultation en visioconférence reste possible.`,
+    a: `Les déplacements concernent le secteur de ${site.area} : ${site.communes.join(", ")}. Hors de ce secteur, la consultation en visioconférence reste possible.`,
   },
   {
     id: "annulation",
     q: "Comment modifier ou annuler un rendez-vous ?",
-    a: `Le message de confirmation contient un lien pour modifier ou annuler le créneau. Le délai à respecter sera indiqué lors de la réservation : ${site.cancelDelay}. Au-delà, les conditions décrites dans les conditions générales de vente s’appliquent.`,
-  },
-  {
-    id: "paiement",
-    q: "Quels moyens de paiement acceptez-vous ?",
-    a: `Le tarif est communiqué avant la consultation, lors de la prise de rendez-vous ou sur devis. Aucun montant n’est affiché sur ce site. Les moyens de paiement seront indiqués ici : ${site.paymentMethods}. Le règlement ne s’effectue pas en ligne.`,
+    a: "Le message de confirmation contient un lien pour modifier ou annuler le créneau. Le délai d’annulation est de 24 h. Au-delà, prévenez par téléphone en cas d’urgence.",
   },
 ] as const;

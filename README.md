@@ -1,6 +1,6 @@
 # Maquette — Nicolas Boyer, diététicien-nutritionniste
 
-Site vitrine, prêt à présenter. Consultations en visioconférence et en déplacement dans le secteur de Condrieu. Application [Vite](https://vite.dev) + React + TypeScript. Les polices (DM Serif Display, Manrope) sont auto-hébergées via Fontsource : aucun script tiers. Aucun tarif n’est publié.
+Site vitrine, prêt à présenter. Consultations en visioconférence partout en France et en déplacement dans le secteur de Condrieu. Application [Vite](https://vite.dev) + React + TypeScript. Les polices (DM Serif Display, Manrope) sont auto-hébergées via Fontsource : aucun script tiers. Aucun tarif n’est publié.
 
 ## Site en ligne
 
@@ -23,13 +23,13 @@ Le serveur de développement sert l’application sous [http://127.0.0.1:5173/ma
 
 ## Personnaliser
 
-Tout ce qui est factuel est dans `src/lib/site.ts` : nom, téléphone, e-mail, adresse, SIREN, RPPS, diplôme, durée indicative, liens Calendly, médiateur. Tant que le téléphone, l’e-mail ou l’adresse restent des placeholders, ils ne sont pas repris dans les données structurées. Le tarif n’a pas de champ : il est communiqué avant la consultation, lors de la prise de rendez-vous ou sur devis.
+Tout ce qui est factuel est dans `src/lib/site.ts` : nom, téléphone, e-mail, adresse, SIREN, RPPS, diplôme, durées, communes, liens Calendly, médiateur. Tant que le téléphone, l’e-mail ou l’adresse restent des placeholders, ils ne sont pas repris dans les données structurées. Le tarif n’a pas de champ : il est communiqué avant la consultation, lors de la prise de rendez-vous.
 
 Les textes de la page d’accueil (domaines, méthode, FAQ) sont dans `src/content/editorial.ts`. Le contenu des trois pages d’accompagnement est dans `src/content/domain-pages.ts`. Les titres SEO sont dans `src/content/pages.ts`.
 
 ## Prise de rendez-vous
 
-Les boutons « Prendre rendez-vous » sont des liens externes (`target="_blank"`, `rel="noopener noreferrer"`) vers les URL Calendly de `site.booking`. « Demander un devis » ouvre un `mailto:` (objet prérempli, sans donnée de santé) et n’enregistre rien sur le site. Aucun widget, aucun script et aucun traceur Calendly n’est chargé. Une mention indique qu’aucune donnée de santé n’est demandée à cette étape.
+Les boutons « Prendre rendez-vous » sont des liens externes (`target="_blank"`, `rel="noopener noreferrer"`) vers les URL Calendly de `site.booking`. Aucun widget, aucun script et aucun traceur Calendly n’est chargé. La mention sur l’absence de donnée de santé figure dans la politique de confidentialité.
 
 ## Photos
 
