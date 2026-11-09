@@ -1,6 +1,6 @@
 # Maquette — Nicolas Boyer, diététicien-nutritionniste
 
-Site vitrine, prêt à présenter. Consultations en visioconférence partout en France et en déplacement dans le secteur de Condrieu. Application [Vite](https://vite.dev) + React + TypeScript. Les polices (DM Serif Display, Manrope) sont auto-hébergées via Fontsource : aucun script tiers. Aucun tarif n’est publié.
+Site vitrine, prêt à présenter. Consultations en visioconférence partout en France et en déplacement dans le secteur de Condrieu. Application [Vite](https://vite.dev) + React + TypeScript. Les polices sont auto-hébergées via Fontsource (Big Shoulders Display pour les grands titres, DM Serif Display pour les titres secondaires, Manrope pour le texte) : aucun script tiers, pas de requête vers Google Fonts. Aucun tarif n’est publié.
 
 ## Site en ligne
 
