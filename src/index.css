@@ -783,18 +783,18 @@ html.is-zooming:not([data-flip]) .book-bar {
 .home h2 { font-size: clamp(1.85rem, 2.8vw, 2.75rem); margin: 0; }
 .home .lede { font-family: var(--sans); font-size: 1.05rem; max-width: 38rem; }
 
-.line-mask {
-  display: block;
+.line-mask,
+.word-mask {
   overflow: hidden;
-  padding-bottom: 0.08em;
-  margin-bottom: -0.08em;
+  padding-top: 0.28em;
+  padding-bottom: 0.34em;
+  margin-top: -0.28em;
+  margin-bottom: -0.34em;
 }
+.line-mask { display: block; }
 .word-mask {
   display: inline-block;
-  overflow: hidden;
   vertical-align: top;
-  padding-bottom: 0.12em;
-  margin-bottom: -0.12em;
 }
 .line-inner { display: block; }
 .word-gap { display: inline-block; width: 0.3em; overflow: hidden; }
@@ -832,11 +832,6 @@ html.is-zooming:not([data-flip]) .book-bar {
   .home-hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: center; }
   .home .pill-row { margin-top: 2.5rem; }
   .home .pill-media { height: 340px; }
-}
-
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
 }
 
 .home-statement { padding: 3.25rem 0 4.25rem; text-align: center; }
@@ -891,30 +886,15 @@ html.is-zooming:not([data-flip]) .book-bar {
   .home-offers-grid { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
 }
 
-.home-call { background: var(--forest-deep); color: var(--ivory); padding: 3.5rem 0 0; overflow: hidden; }
+.home-call { background: var(--forest-deep); color: var(--ivory); padding: 3.5rem 0 3rem; }
 .home-call h2,
 .home-call p { color: var(--ivory); }
 .home-call-grid { display: grid; gap: 1.5rem; align-items: center; }
 .home-call-kicker { margin: 0 0 0.8rem; letter-spacing: 0.04em; font-size: 0.95rem; }
 .home-call-photo { margin: 0; border-radius: 1.4rem; overflow: hidden; justify-self: end; width: min(280px, 100%); }
 .home-call-photo img { width: 100%; aspect-ratio: 1; object-fit: cover; }
-.home-call-line {
-  display: flex;
-  gap: 2rem;
-  margin-top: 2.5rem;
-  padding: 1rem 0;
-  border-top: 1px solid rgba(255, 253, 245, 0.28);
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
-  letter-spacing: 0;
-  white-space: nowrap;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .home-call-line { animation: ticker 28s linear infinite; }
-}
 @media (min-width: 900px) {
-  .home-call { padding-top: 4.5rem; }
+  .home-call { padding: 4.5rem 0 3.5rem; }
   .home-call-grid { grid-template-columns: 1.3fr 0.7fr; }
 }
 

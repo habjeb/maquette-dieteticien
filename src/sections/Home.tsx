@@ -363,14 +363,6 @@ function CallBand() {
           <Photo {...photos.portrait} />
         </Reveal>
       </div>
-      <div className="home-call-line" aria-hidden="true">
-        <span>Prendre rendez-vous</span>
-        <span>Visio</span>
-        <span>Déplacement</span>
-        <span>Prendre rendez-vous</span>
-        <span>Visio</span>
-        <span>Déplacement</span>
-      </div>
     </section>
   );
 }

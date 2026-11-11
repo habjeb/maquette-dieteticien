@@ -183,7 +183,7 @@ function mountReveal(item: RevealItem, first: boolean) {
   }
   item.tween = gsap.fromTo(
     inners,
-    { yPercent: 115 },
+    { yPercent: 140 },
     {
       yPercent: 0,
       duration: item.mode === "title" ? 1.4 : 1.2,
