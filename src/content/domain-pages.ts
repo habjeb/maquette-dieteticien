@@ -1,27 +1,33 @@
 import type { DomainId } from "./editorial";
 
+export type DomainFaq = {
+  id: string;
+  q: string;
+  a: string;
+  links?: readonly { href: string; label: string }[];
+};
+
 export type DomainBody = {
   forWhom: string;
   objectives: string;
   course: string;
   situations: readonly string[];
   medical: string | null;
-  faq: readonly { id: string; q: string; a: string }[];
+  faq: readonly DomainFaq[];
 };
 
 export const domainBodies: Record<DomainId, DomainBody> = {
   equilibre: {
     forWhom:
-      "Cet accompagnement s’adresse aux personnes qui veulent revoir leurs habitudes alimentaires, simplifier les courses ou les repas, ou parler du poids si cela fait partie de leur demande. Le poids n’est ni une condition pour consulter, ni le seul sujet possible.",
+      "Cet accompagnement s’adresse à toute personne qui souhaite faire le point sur son alimentation et trouver des repères adaptés à son quotidien. Si vous souhaitez parler de votre poids, nous pouvons aussi l’aborder en consultation.",
     objectives:
-      "L’objectif est un rythme tenable dans votre semaine : horaires, goûts, budget, vie de famille ou de travail. Les repères sont proposés, puis ajustés avec vous. Aucun modèle n’est imposé, et aucun résultat n’est promis.",
+      "L’idée est de trouver des habitudes alimentaires qui vous conviennent au fil de la semaine, en tenant compte de vos horaires, de vos goûts, de votre budget et de votre vie familiale ou professionnelle.",
     course:
-      "Le cadre est celui des autres consultations : un bilan pour comprendre la situation, des repères individualisés, puis un suivi pour les ajuster. Le déroulé du premier échange est précisé au moment du rendez-vous. Rien de tout cela n’est demandé dans le formulaire de réservation.",
+      "Lors du premier bilan, nous faisons le point sur vos habitudes et choisissons ensemble les premiers changements à essayer. Si vous souhaitez poursuivre, les rendez-vous de suivi permettent de faire le point sur ce qui vous a aidé et d’ajuster les conseils.",
     situations: [
-      "Des repas sautés, très irréguliers, ou difficiles à organiser dans la journée.",
-      "Des courses et une cuisine que vous aimeriez rendre plus simples.",
-      "L’envie de composer l’assiette autrement, sans régime figé.",
-      "Le souhait d’évoquer le poids, à votre initiative seulement.",
+      "Vos horaires changent et vous avez du mal à trouver le temps de manger dans la journée.",
+      "Vous manquez d’idées pour les repas et aimeriez simplifier vos courses.",
+      "Vous vous demandez comment composer des repas équilibrés avec les aliments que vous aimez.",
     ],
     medical: null,
     faq: [
@@ -44,19 +50,17 @@ export const domainBodies: Record<DomainId, DomainBody> = {
   },
   pathologies: {
     forWhom:
-      "Cette page concerne les personnes pour qui une maladie, un traitement ou des symptômes amènent à adapter l’alimentation, et qui cherchent des repères concrets. Le médecin reste le référent du diagnostic et du traitement.",
+      "Cet accompagnement s’adresse aux personnes qui souhaitent adapter leur alimentation en raison d’une pathologie, d’un traitement ou de symptômes qui compliquent les repas.",
     objectives:
-      "Il s’agit de traduire une situation de santé en habitudes compréhensibles, compatibles avec ce qui est déjà en place : traitements, rendez-vous, vie quotidienne. L’accompagnement ne promet pas d’évolution clinique.",
+      "Je vous aide à comprendre les recommandations nutritionnelles liées à votre situation et à les mettre en pratique. Selon vos besoins, nous pouvons travailler sur le choix des aliments, la composition des repas ou leur organisation dans la journée.",
     course:
-      "Le premier échange permet de comprendre le contexte. Vous pouvez apporter les documents remis par votre médecin, sans que ce soit une condition. Aucune information de santé n’est demandée sur ce site, ni dans le formulaire de réservation.",
+      "Lors du premier bilan, nous faisons le point sur vos habitudes alimentaires, les difficultés que vous rencontrez et les recommandations que vous avez déjà reçues. Si vous le souhaitez, vous pouvez apporter les documents remis par votre médecin. L’accompagnement diététique s’inscrit en complément de votre suivi médical. Les rendez-vous de suivi permettent d’ajuster les conseils à ce que vous avez pu mettre en place.",
     situations: [
-      "Un traitement qui modifie l’appétit, le goût ou les horaires des repas.",
-      "Une recommandation médicale déjà donnée, à rendre praticable au quotidien.",
-      "Des symptômes qui conduisent à revoir la composition ou le rythme des repas.",
-      "Un suivi au long cours, en lien avec l’équipe soignante déjà en place.",
+      "Votre traitement modifie votre appétit ou le goût des aliments.",
+      "Votre médecin vous a conseillé d’adapter votre alimentation et vous vous demandez comment le faire au quotidien.",
+      "Des symptômes compliquent vos repas et vous souhaitez faire le point sur votre alimentation.",
     ],
-    medical:
-      "L’accompagnement nutritionnel est complémentaire du suivi médical. Il ne pose pas de diagnostic, ne remplace pas une consultation de médecin et ne se substitue pas à un traitement prescrit.",
+    medical: null,
     faq: [
       {
         id: "diagnostic",
@@ -77,33 +81,32 @@ export const domainBodies: Record<DomainId, DomainBody> = {
   },
   sport: {
     forWhom:
-      "Cet accompagnement s’adresse aux personnes qui s’entraînent, en loisir ou de façon plus structurée, et qui veulent relier leurs repas à leurs séances. Il n’est pas réservé aux compétiteurs, et il ne résume pas une pratique qui reste généraliste.",
+      "Cet accompagnement s’adresse aux personnes qui souhaitent adapter leur alimentation à leur pratique sportive, qu’elles s’entraînent pour le plaisir, pour progresser ou pour préparer une compétition.",
     objectives:
-      "Les repères portent sur le moment des repas, la récupération et, seulement si cela a un sens pour vous, la composition corporelle. Elle n’est pas une fin en soi. La performance n’est pas un résultat promis.",
+      "Je vous aide à organiser votre alimentation et votre hydratation pour répondre aux besoins de vos entraînements et soutenir votre récupération. Selon vos objectifs, nous pouvons également aborder la prise de masse musculaire ou l’évolution de votre composition corporelle.",
     course:
-      "Le bilan revient sur la pratique, les horaires et les contraintes du quotidien. Les ajustements viennent ensuite, au rythme convenu. En cas de blessure, de symptôme ou de suivi médical, le médecin reste le référent.",
+      "Lors du premier bilan, nous faisons le point sur votre pratique, votre rythme d’entraînement, vos habitudes alimentaires et vos objectifs. Nous définissons ensemble des ajustements compatibles avec votre quotidien. Le suivi permet de les faire évoluer selon vos sensations, vos contraintes et votre programme d’entraînement.",
     situations: [
-      "Des séances qui tombent loin des repas habituels.",
-      "La préparation d’une échéance : course, compétition amateur, stage.",
-      "Une récupération difficile à organiser entre les entraînements.",
-      "Une question de composition corporelle, uniquement si elle est pertinente pour vous.",
+      "Vous souhaitez savoir quoi manger avant, pendant ou après vos séances.",
+      "Vos entraînements sont difficiles à concilier avec vos horaires de repas.",
+      "Vous préparez une course, une compétition ou un stage sportif.",
+      "Vous souhaitez adapter votre alimentation à un objectif de prise de masse musculaire ou de composition corporelle.",
     ],
     medical: null,
     faq: [
       {
-        id: "licence",
-        q: "Faut-il être licencié ou compétiteur ?",
-        a: "Non. La pratique de loisir entre dans ce cadre au même titre qu’un entraînement plus structuré. Le niveau n’est pas une condition.",
-      },
-      {
         id: "performance",
-        q: "La performance est-elle un objectif garanti ?",
-        a: "Non. L’alimentation peut accompagner l’entraînement, la récupération et une échéance. Aucun résultat sportif n’est promis.",
+        q: "Une alimentation adaptée suffit-elle à améliorer mes performances ?",
+        a: "Non. Une alimentation adaptée peut soutenir vos entraînements, votre récupération et la préparation d’une compétition. Vos performances dépendent aussi d’autres facteurs, comme votre entraînement et votre sommeil.",
       },
       {
         id: "generaliste",
         q: "La nutrition sportive est-elle la seule activité du cabinet ?",
-        a: "Non. C’est un domaine d’intérêt, à côté de l’équilibre alimentaire et de la nutrition thérapeutique. La pratique reste généraliste.",
+        a: "Non. Je propose aussi des consultations pour faire le point sur votre équilibre alimentaire ou adapter votre alimentation à une pathologie.",
+        links: [
+          { href: "/equilibre-alimentaire", label: "Équilibre alimentaire" },
+          { href: "/pathologies-nutrition-therapeutique", label: "Pathologies et nutrition thérapeutique" },
+        ],
       },
     ],
   },

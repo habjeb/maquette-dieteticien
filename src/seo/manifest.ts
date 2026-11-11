@@ -1,3 +1,4 @@
+import { domainBodies } from "../content/domain-pages";
 import { faq, heroText, heroTitle } from "../content/editorial";
 import { pages, type PageMeta } from "../content/pages";
 import { site } from "../lib/site";
@@ -56,6 +57,23 @@ function faqPage() {
   };
 }
 
+function sportFaqPage() {
+  return {
+    "@type": "FAQPage",
+    "@id": `${absolute("/nutrition-sportive")}#faq`,
+    mainEntity: domainBodies.sport.faq.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.links?.length
+          ? `${item.a} ${item.links.map((link) => `${link.label} : ${absolute(link.href)}`).join(" ")}`
+          : item.a,
+      },
+    })),
+  };
+}
+
 function person() {
   return {
     "@type": "Person",
@@ -89,6 +107,24 @@ function graphFor(page: PageMeta) {
     return {
       "@context": "https://schema.org",
       "@graph": [website(), person(), breadcrumb(page)],
+    };
+  }
+  if (page.id === "sport") {
+    return {
+      "@context": "https://schema.org",
+      "@graph": [
+        website(),
+        {
+          "@type": "WebPage",
+          name: page.title,
+          description: page.description,
+          url: absolute(page.path),
+          isPartOf: { "@id": `${site.url}#site` },
+          inLanguage: "fr-FR",
+        },
+        breadcrumb(page),
+        sportFaqPage(),
+      ],
     };
   }
   return {
