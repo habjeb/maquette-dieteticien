@@ -37,12 +37,15 @@ function frame() {
 }
 
 function measureViewport() {
-  const width = document.documentElement.clientWidth;
   const probe = document.createElement("div");
-  probe.style.cssText = "position:fixed;left:0;top:0;width:100%;height:100dvh;visibility:hidden;pointer-events:none;";
+  probe.style.cssText = "position:fixed;left:0;top:0;width:100vw;height:100dvh;visibility:hidden;pointer-events:none;";
   document.body.appendChild(probe);
-  const height = probe.getBoundingClientRect().height;
+  const box = probe.getBoundingClientRect();
   probe.remove();
+  const visual = window.visualViewport;
+  const width = Math.max(box.width, visual?.width ?? 0, window.innerWidth);
+  const height = Math.max(box.height, visual?.height ?? 0, window.innerHeight);
+  document.documentElement.style.setProperty("--flip-h", `${height}px`);
   return { width, height };
 }
 
@@ -82,12 +85,21 @@ export function syncPillWindows() {
   });
 }
 
-function clipFor(rect: { top: number; left: number; width: number; height: number }, view: { width: number; height: number }) {
+function endRadius(rect: Box, view: { width: number; height: number }) {
+  const covers =
+    rect.top <= 1 &&
+    rect.left <= 1 &&
+    rect.width >= view.width - 2 &&
+    rect.height >= view.height - 2;
+  if (covers) return 0;
+  return Math.min(Math.max(rect.width, 0), Math.max(rect.height, 0)) / 2;
+}
+
+function clipFor(rect: Box, view: { width: number; height: number }, radius: number) {
   const top = rect.top;
   const left = rect.left;
   const right = view.width - (rect.left + rect.width);
   const bottom = view.height - (rect.top + rect.height);
-  const radius = Math.min(Math.max(rect.width, 0), Math.max(rect.height, 0)) / 2;
   return `inset(${top}px ${right}px ${bottom}px ${left}px round ${radius}px)`;
 }
 
@@ -235,23 +247,32 @@ async function playZoom(options: {
     layer.style.width = `${view.width}px`;
     layer.style.height = `${view.height}px`;
     alignWindow(img, layer, view);
-    const fromClip = clipFor(from, view);
-    const toClip = clipFor(to, view);
+    const fromClip = clipFor(from, view, endRadius(from, view));
+    const toClip = clipFor(to, view, endRadius(to, view));
     setClip(layer, fromClip);
     layer.getBoundingClientRect();
     await frame();
     await frame();
-    const anim = layer.animate([{ clipPath: fromClip }, { clipPath: toClip }], {
-      duration,
-      easing: EASING,
-      fill: "forwards",
-    });
+    const anim = layer.animate(
+      [
+        { clipPath: fromClip, webkitClipPath: fromClip },
+        { clipPath: toClip, webkitClipPath: toClip },
+      ],
+      {
+        duration,
+        easing: EASING,
+        fill: "forwards",
+      },
+    );
     await runAnimation(anim, (t) => {
       if (ripple.liquid && ripple.crop) ripple.liquid.draw(t, Math.sin(Math.PI * t) * 0.55, ripple.crop);
     });
+    setClip(layer, toClip);
+    if (endRadius(to, view) === 0) await wait(160);
+    await frame();
   } else {
-    const fromRadius = Math.min(from.width, from.height) / 2;
-    const toRadius = Math.min(to.width, to.height) / 2;
+    const fromRadius = endRadius(from, view);
+    const toRadius = endRadius(to, view);
     layer.style.top = `${from.top}px`;
     layer.style.left = `${from.left}px`;
     layer.style.width = `${from.width}px`;
@@ -285,6 +306,14 @@ async function playZoom(options: {
       alignWindow(img, layer, view);
       if (ripple.liquid && ripple.crop) ripple.liquid.draw(t, Math.sin(Math.PI * t) * 0.55, ripple.crop);
     });
+    layer.style.top = `${to.top}px`;
+    layer.style.left = `${to.left}px`;
+    layer.style.width = `${to.width}px`;
+    layer.style.height = `${to.height}px`;
+    layer.style.borderRadius = `${toRadius}px`;
+    alignWindow(img, layer, view);
+    if (toRadius === 0) await wait(160);
+    await frame();
   }
   ripple.liquid?.destroy();
   ripple.canvas?.remove();
