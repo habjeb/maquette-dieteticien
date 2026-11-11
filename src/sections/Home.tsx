@@ -1,55 +1,78 @@
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { FaqList } from "../components/FaqList";
-import { BookLink, Photo, SectionHead } from "../components/ui";
-import { domains, faq, heroText, photos, steps } from "../content/editorial";
+import { BookLink, Photo } from "../components/ui";
+import { domains, faq, heroText, heroTitle, photos, steps } from "../content/editorial";
 import { openDomain, syncPillWindows } from "../fx/domainFlip";
 import { sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
 
+const tickerWords = [
+  "Visio partout en France",
+  "Déplacement secteur Condrieu",
+  "Suivi personnalisé",
+  "Nutrition sportive",
+  "Pathologies",
+  "Équilibre alimentaire",
+  "Bilan 60 minutes",
+  "Suivi 30 à 45 minutes",
+] as const;
+
+const markers = [
+  "Visioconférence partout en France",
+  `Déplacement dans le secteur de ${site.area}`,
+  site.communes.join(", "),
+  site.experiences,
+  site.sportBackground,
+  `Bilan initial : ${site.durationInitial}`,
+  `Consultation de suivi : ${site.durationFollowUp}`,
+  `Annulation : ${site.cancelDelay}`,
+  `Règlement : ${site.paymentMethods}`,
+] as const;
+
 export function HomePage() {
   return (
-    <>
+    <div className="home">
       <Hero />
-      <Domaines />
-      <Presentation />
-      <Lieu />
-      <Methode />
+      <Ticker />
+      <Statement />
+      <About />
       <Consultations />
+      <CallBand />
+      <Markers />
       <Faq />
-      <Reservation />
-    </>
+    </div>
+  );
+}
+
+function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      node.classList.add("is-in");
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        node.classList.add("is-in");
+        observer.disconnect();
+      },
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`reveal${className ? ` ${className}` : ""}`}>
+      {children}
+    </div>
   );
 }
 
 function Hero() {
-  return (
-    <section className="hero" id="accueil">
-      <div className="container hero-grid">
-        <div className="hero-copy">
-          <p className="kicker">{site.jobTitle}</p>
-          <h1>
-            La nutrition au service de votre <em>santé</em> et de vos ambitions.
-          </h1>
-          <p className="lede">{heroText}</p>
-          <div className="hero-actions" id="hero-ctas" data-booking-visible>
-            <BookLink href={site.booking.general} label="Prendre rendez-vous">
-              Prendre rendez-vous
-            </BookLink>
-            <A className="btn btn-secondary" href={`${sitePath("/")}#accompagnements`}>
-              Découvrir les accompagnements
-            </A>
-          </div>
-        </div>
-        <figure className="hero-media">
-          <Photo {...photos.hero} priority />
-        </figure>
-      </div>
-    </section>
-  );
-}
-
-function Domaines() {
   const { navigate } = useRoute();
   useLayoutEffect(() => {
     const update = () => syncPillWindows();
@@ -64,13 +87,19 @@ function Domaines() {
       row?.removeEventListener("scroll", update);
     };
   }, []);
+
   return (
-    <section className="section" id="accompagnements">
-      <div className="container">
-        <SectionHead
-          title="Domaines d’accompagnement"
-          intro="Chaque accompagnement commence par un échange sur vos habitudes, vos besoins et vos objectifs. Ensemble, nous définissons des repères que vous pouvez appliquer au quotidien."
-        />
+    <section className="home-hero" id="accueil">
+      <div className="container home-hero-grid">
+        <Reveal>
+          <h1>{heroTitle}</h1>
+          <p className="lede home-hero-lede">{heroText}</p>
+        </Reveal>
+        <Reveal className="home-hero-photo">
+          <Photo {...photos.hero} priority />
+        </Reveal>
+      </div>
+      <div className="container" id="accompagnements">
         <div className="pill-row">
           {domains.map((domain) => {
             const href = sitePath(domain.path);
@@ -89,8 +118,10 @@ function Domaines() {
                   <span className="pill-media" data-pill={domain.id}>
                     <Photo {...domain.photo} />
                   </span>
-                  <h3>{domain.title}</h3>
-                  <p>{domain.summary}</p>
+                  <span className="pill-copy">
+                    <h3>{domain.title}</h3>
+                    <p>{domain.summary}</p>
+                  </span>
                 </A>
               </article>
             );
@@ -101,113 +132,203 @@ function Domaines() {
   );
 }
 
-function Presentation() {
+function Ticker() {
+  const line = [...tickerWords, ...tickerWords];
   return (
-    <section className="section section-sage" id="a-propos">
-      <div className="container about-grid">
-        <figure className="portrait">
-          <Photo {...photos.portrait} />
-        </figure>
-        <div>
-          <SectionHead
-            title="À propos"
-            intro="Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace à domicile dans la région sud lyonnaise."
-          />
-          <dl className="facts">
-            <div>
-              <dt>Diplôme</dt>
-              <dd>{site.diploma}</dd>
-            </div>
-            <div>
-              <dt>Expérience</dt>
-              <dd>
-                {site.experiences}
-                <br />
-                {site.sportBackground}
-              </dd>
-            </div>
-          </dl>
-          <p>
-            Pour moi, un conseil alimentaire doit avoir sa place dans votre quotidien. En consultation, je prends
-            d’abord le temps de comprendre ce qui vous amène, ce qui vous convient déjà et ce que vous aimeriez faire
-            évoluer.
-          </p>
-          <p>
-            Je m’appuie sur les recommandations scientifiques pour vous expliquer les options qui s’offrent à vous, en
-            tenant compte de vos goûts, de votre rythme de vie, de votre budget et, si nécessaire, de votre suivi
-            médical. Ensemble, nous choisissons les premiers changements à essayer, à votre rythme.
-          </p>
-          <p>
-            <A href={sitePath("/carte")}>Ouvrir la carte de visite digitale</A>
-          </p>
-        </div>
+    <section className="ticker" aria-label="Repères de la pratique">
+      <div className="ticker-row">
+        <ul className="ticker-track">
+          {line.map((word, index) => (
+            <li key={`a-${word}-${index}`}>{word}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="ticker-row">
+        <ul className="ticker-track ticker-track-back" aria-hidden="true">
+          {line.map((word, index) => (
+            <li key={`b-${word}-${index}`}>{word}</li>
+          ))}
+        </ul>
       </div>
     </section>
   );
 }
 
-function Lieu() {
+function Statement() {
   return (
-    <figure className="lieu">
-      <Photo {...photos.saone} />
-      <figcaption>
-        Illustration — quais de la Saône, à Lyon. Les déplacements concernent le secteur de {site.area}, plus au sud
-        le long du Rhône. Cette photo n’est pas le lieu de consultation.
-      </figcaption>
-    </figure>
+    <section className="home-statement">
+      <div className="container">
+        <Reveal>
+          <p>Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent.</p>
+          <A className="btn btn-primary" href={`${sitePath("/")}#accompagnements`}>
+            Découvrir les accompagnements
+          </A>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
-function Methode() {
+function About() {
   return (
-    <section className="section" id="methode">
+    <section className="home-split" id="a-propos">
       <div className="container">
-        <SectionHead
-          title="Méthode d’accompagnement"
-          intro="Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent."
-        />
-        <ol className="steps">
-          {steps.map((step, index) => (
-            <li key={step.title}>
-              <span className="step-index">0{index + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
-        </ol>
+        <Reveal className="home-split-head">
+          <h2>Un conseil alimentaire doit avoir sa place dans votre quotidien.</h2>
+          <div>
+            <p>
+              Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace à
+              domicile dans la région sud lyonnaise.
+            </p>
+            <A className="btn btn-primary" href={sitePath("/carte")}>
+              Carte de visite
+            </A>
+          </div>
+        </Reveal>
+        <Reveal className="home-split-row">
+          <h3>
+            <span aria-hidden="true">• </span>À propos
+          </h3>
+          <div>
+            <figure className="portrait">
+              <Photo {...photos.portrait} />
+            </figure>
+            <dl className="facts">
+              <div>
+                <dt>Diplôme</dt>
+                <dd>{site.diploma}</dd>
+              </div>
+              <div>
+                <dt>Expérience</dt>
+                <dd>
+                  {site.experiences}
+                  <br />
+                  {site.sportBackground}
+                </dd>
+              </div>
+            </dl>
+            <p>
+              Pour moi, un conseil alimentaire doit avoir sa place dans votre quotidien. En consultation, je prends
+              d’abord le temps de comprendre ce qui vous amène, ce qui vous convient déjà et ce que vous aimeriez faire
+              évoluer.
+            </p>
+            <p>
+              Je m’appuie sur les recommandations scientifiques pour vous expliquer les options qui s’offrent à vous, en
+              tenant compte de vos goûts, de votre rythme de vie, de votre budget et, si nécessaire, de votre suivi
+              médical. Ensemble, nous choisissons les premiers changements à essayer, à votre rythme.
+            </p>
+          </div>
+        </Reveal>
+        <Reveal className="home-split-row" >
+          <h3 id="methode">
+            <span aria-hidden="true">• </span>Approche
+          </h3>
+          <ol className="steps">
+            {steps.map((step, index) => (
+              <li key={step.title}>
+                <span className="step-index">0{index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </Reveal>
       </div>
     </section>
   );
 }
 
 function Consultations() {
+  const groups = [
+    {
+      id: "bilan",
+      name: "Bilan initial",
+      duration: site.durationInitial,
+      items: offers.filter((offer) => offer.group === "Bilan initial"),
+    },
+    {
+      id: "suivi",
+      name: "Consultation de suivi",
+      duration: site.durationFollowUp,
+      items: offers.filter((offer) => offer.group === "Consultation de suivi"),
+    },
+  ];
   return (
-    <section className="section section-sage" id="consultations">
+    <section className="home-offers" id="consultations">
       <div className="container">
-        <SectionHead title="Modalités de consultation" intro={tariffSentence} />
-        <div className="consult-grid" data-booking-visible>
-          {offers.map((offer) => (
-            <article className="consult-card" key={offer.id} id={offer.id}>
-              <p className="kicker">{offer.group}</p>
-              <h3>{offer.name}</h3>
-              <dl>
-                <div>
-                  <dt>Durée</dt>
-                  <dd>{offer.duration}</dd>
+        <Reveal className="home-offers-head">
+          <h2>Modalités de consultation</h2>
+          <p>{tariffSentence}</p>
+        </Reveal>
+        <div className="home-offers-grid" data-booking-visible>
+          {groups.map((group) => (
+            <Reveal key={group.id}>
+              <article className="home-offer" id={group.id}>
+                <h3>{group.name}</h3>
+                <p className="home-offer-duration">{group.duration}</p>
+                <p>En visioconférence partout en France, ou en déplacement dans le secteur de {site.area}.</p>
+                <div className="consult-actions">
+                  {group.items.map((offer) => (
+                    <BookLink key={offer.id} href={offer.href} label={offer.label}>
+                      {offer.name}
+                    </BookLink>
+                  ))}
                 </div>
-                <div>
-                  <dt>Modalité</dt>
-                  <dd>{offer.modality}</dd>
-                </div>
-              </dl>
-              <div className="consult-actions">
-                <BookLink href={offer.href} label={offer.label}>
-                  Prendre rendez-vous
-                </BookLink>
-              </div>
-            </article>
+              </article>
+            </Reveal>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function CallBand() {
+  return (
+    <section className="home-call" id="rendez-vous" data-booking-visible>
+      <div className="container home-call-grid">
+        <Reveal>
+          <p className="home-call-kicker">Rendez-vous</p>
+          <h2>Prendre rendez-vous</h2>
+          <p>
+            {site.practiceLine} {tariffSentence} {site.privacyNote}
+          </p>
+          <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-light">
+            Prendre rendez-vous
+          </BookLink>
+        </Reveal>
+        <Reveal className="home-call-photo">
+          <Photo {...photos.portrait} />
+        </Reveal>
+      </div>
+      <div className="home-call-line" aria-hidden="true">
+        <span>Prendre rendez-vous</span>
+        <span>Visio</span>
+        <span>Déplacement</span>
+        <span>Prendre rendez-vous</span>
+        <span>Visio</span>
+        <span>Déplacement</span>
+      </div>
+    </section>
+  );
+}
+
+function Markers() {
+  return (
+    <section className="home-markers" aria-labelledby="reperes-titre">
+      <div className="container">
+        <Reveal className="home-split-head">
+          <h2 id="reperes-titre">Repères de la pratique</h2>
+          <p>
+            Uniquement ce qui est déjà indiqué sur le site. Les diplômes, numéros et logos encore entre crochets ne
+            sont pas présentés ici comme des certifications.
+          </p>
+        </Reveal>
+        <ul className="home-marker-grid">
+          {markers.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </div>
     </section>
   );
@@ -215,35 +336,13 @@ function Consultations() {
 
 function Faq() {
   return (
-    <section className="section" id="faq">
+    <section className="home-faq" id="faq">
       <div className="container faq-layout">
-        <SectionHead
-          title="Questions fréquentes"
-          intro="Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire."
-        />
+        <Reveal>
+          <h2>Questions fréquentes</h2>
+          <p>Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire.</p>
+        </Reveal>
         <FaqList items={faq} />
-      </div>
-    </section>
-  );
-}
-
-function Reservation() {
-  return (
-    <section className="band" id="rendez-vous" data-booking-visible>
-      <div className="container band-inner">
-        <p className="kicker kicker-light">Rendez-vous</p>
-        <h2>Choisir un créneau</h2>
-        <p>
-          Quatre liens : bilan ou suivi, en visioconférence partout en France ou en déplacement dans le secteur de{" "}
-          {site.area}. Ils ouvrent la page de réservation dans un nouvel onglet. {tariffSentence}
-        </p>
-        <div className="band-actions">
-          {offers.map((offer) => (
-            <BookLink key={offer.id} href={offer.href} label={offer.label} className="btn btn-light">
-              {offer.group} — {offer.name}
-            </BookLink>
-          ))}
-        </div>
       </div>
     </section>
   );
