@@ -214,7 +214,7 @@ a:hover { color: var(--forest-deep); }
   flex: none;
 }
 .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-.brand-name { font-family: var(--sans); font-weight: 560; font-size: 1.05rem; letter-spacing: -0.02em; }
+.brand-name { font-family: var(--serif); font-size: 1.15rem; }
 .brand-role { font-size: 0.75rem; letter-spacing: 0.02em; color: var(--forest); }
 .nav-desktop { display: none; }
 .header-tools { display: flex; align-items: center; gap: 0.5rem; }
@@ -729,17 +729,12 @@ html.is-zooming:not([data-flip]) .book-bar {
 
 .home h1,
 .home h2 {
-  font-family: var(--sans);
-  font-weight: 400;
-  letter-spacing: -0.035em;
-  text-transform: none;
-  line-height: 1.08;
   color: var(--ink);
+  max-width: 100%;
 }
-.home h1 { font-size: clamp(2.5rem, 5.4vw, 6.1rem); margin: 0 0 1rem; max-width: 11ch; }
-.home h2 { font-size: clamp(2rem, 3.4vw, 3.4rem); margin: 0; }
-.home h3 { font-family: var(--sans); font-weight: 500; letter-spacing: -0.02em; }
-.home .lede { font-size: 1.05rem; max-width: 38rem; }
+.home h1 { font-size: clamp(2.35rem, 4.4vw, 4.6rem); margin: 0 0 1rem; }
+.home h2 { font-size: clamp(1.85rem, 2.8vw, 2.75rem); margin: 0; }
+.home .lede { font-family: var(--sans); font-size: 1.05rem; max-width: 38rem; }
 
 @media (prefers-reduced-motion: no-preference) {
   .reveal {
@@ -803,8 +798,8 @@ html.is-zooming:not([data-flip]) .book-bar {
 }
 .ticker-track li {
   font-family: var(--sans);
-  font-weight: 400;
-  font-size: clamp(1.7rem, 3.6vw, 3.1rem);
+  font-weight: 500;
+  font-size: clamp(1.45rem, 2.6vw, 2.35rem);
   letter-spacing: -0.03em;
   line-height: 1.15;
   white-space: nowrap;
@@ -841,7 +836,7 @@ html.is-zooming:not([data-flip]) .book-bar {
   padding: 2.2rem 0;
   border-top: 1px solid var(--line);
 }
-.home-split-head h2 { max-width: 14ch; }
+.home-split-head h2 { max-width: 18ch; }
 .home-split-row h3 { margin: 0; font-size: 1.35rem; }
 .home-split .portrait { margin-bottom: 1rem; }
 @media (min-width: 900px) {
@@ -886,8 +881,10 @@ html.is-zooming:not([data-flip]) .book-bar {
   margin-top: 2.5rem;
   padding: 1rem 0;
   border-top: 1px solid rgba(255, 253, 245, 0.28);
-  font-size: clamp(1.4rem, 3vw, 2.2rem);
-  letter-spacing: -0.03em;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+  letter-spacing: 0;
   white-space: nowrap;
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -922,10 +919,3 @@ html.is-zooming:not([data-flip]) .book-bar {
 }
 
 .home-faq { padding: 2rem 0 4.5rem; }
-.home-faq .faq-item button {
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
-}
-.home-faq .faq-symbol { font-family: var(--sans); font-weight: 400; }
