@@ -595,10 +595,11 @@ body.nav-open { overflow: hidden; }
 }
 .carte-role { font-family: var(--serif); font-size: 1.35rem; margin-bottom: 0.25rem; }
 
-.domain-page.section { padding-top: 0; }
+.domain-page.section { padding-top: 0; overflow-x: hidden; }
 .domain-stage {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  width: var(--flip-w, 100vw);
   height: 100vh;
   height: 100dvh;
   height: var(--flip-h, 100dvh);
@@ -716,13 +717,9 @@ html.is-zooming:not([data-flip]) .book-bar {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  *:not(.flip-layer), *::before, *::after {
     animation: none !important;
     transition: none !important;
-  }
-  .flip-layer, .flip-layer * {
-    animation: unset !important;
-    transition: unset !important;
   }
 }
 
