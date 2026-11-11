@@ -1,4 +1,5 @@
 import { sitePath } from "../lib/paths";
+import { pauseScroll, resumeScroll } from "./motion";
 import type { Liquid } from "./liquid";
 
 type Mode = "full" | "plain";
@@ -83,14 +84,15 @@ export function syncPillWindows() {
   });
 }
 
-function endRadius(rect: Box, view: { width: number; height: number }) {
-  const covers =
-    rect.top <= 1 &&
-    rect.left <= 1 &&
-    rect.width >= view.width - 2 &&
-    rect.height >= view.height - 2;
-  if (covers) return 0;
-  return Math.min(Math.max(rect.width, 0), Math.max(rect.height, 0)) / 2;
+function cornerRadius(el: HTMLElement) {
+  const raw = getComputedStyle(el).borderTopLeftRadius.trim();
+  const value = Number.parseFloat(raw);
+  if (!Number.isFinite(value)) return 0;
+  if (raw.endsWith("%")) {
+    const rect = el.getBoundingClientRect();
+    return (value / 100) * Math.min(rect.width, rect.height);
+  }
+  return value;
 }
 
 function clipFor(rect: Box, view: { width: number; height: number }, radius: number) {
@@ -109,7 +111,7 @@ let clipReady: boolean | null = null;
 let pinGeneration = 0;
 
 function rememberScroll(source: HTMLElement) {
-  const row = source.closest(".pill-row");
+  const row = source.closest(".sector-cards");
   scrollMemory = {
     top: window.scrollY,
     left: row instanceof HTMLElement ? row.scrollLeft : 0,
@@ -119,7 +121,7 @@ function rememberScroll(source: HTMLElement) {
 function restoreScroll() {
   if (!scrollMemory) return;
   window.scrollTo(0, scrollMemory.top);
-  const row = document.querySelector(".pill-row");
+  const row = document.querySelector(".sector-cards");
   if (row instanceof HTMLElement) row.scrollLeft = scrollMemory.left;
 }
 
@@ -315,13 +317,13 @@ async function playZoom(options: {
   source: HTMLImageElement;
   from: Box;
   to: Box;
+  fromRadius: number;
+  toRadius: number;
   view: { width: number; height: number };
 }) {
-  const { layer, img, source, from, to, view } = options;
+  const { layer, img, source, from, to, fromRadius, toRadius, view } = options;
   const duration = zoomDuration();
   const useClip = clipPathAnimates();
-  const fromRadius = endRadius(from, view);
-  const toRadius = endRadius(to, view);
   document.documentElement.dataset.zoomTech = useClip ? "clip" : "box";
   const ripple = attachRipple(layer, source, view);
   // Each frame is an inline style. A WAAPI clip-path leaves the corner radius
@@ -414,6 +416,7 @@ export async function openDomain(options: {
     /* ignore */
   }
   rememberScroll(options.source);
+  pauseScroll();
   const heldScroll = window.scrollY;
   const keepScroll = () => {
     if (document.documentElement.dataset.zoomPhase === "run" && Math.abs(window.scrollY - heldScroll) > 1) {
@@ -437,6 +440,8 @@ export async function openDomain(options: {
       source: image,
       from: fromRect,
       to: full,
+      fromRadius: cornerRadius(options.source),
+      toRadius: 0,
       view,
     });
     if (!covered || !coversViewport(layer, view)) {
@@ -447,6 +452,7 @@ export async function openDomain(options: {
     if (!coversViewport(layer, view)) {
       layer.remove();
       options.navigate(options.href, { fromPills: true, scrollY: scrollMemory?.top ?? 0 });
+      resumeScroll(0);
       return;
     }
     document.documentElement.dataset.zoomPhase = "covered";
@@ -463,6 +469,7 @@ export async function openDomain(options: {
   }
   if (generation !== pinGeneration || document.documentElement.dataset.flip === "close") {
     layer.remove();
+    resumeScroll(scrollMemory?.top);
     return;
   }
   pinTop();
@@ -474,6 +481,7 @@ export async function openDomain(options: {
   }
   if (generation !== pinGeneration || document.documentElement.dataset.flip !== "open") {
     layer.remove();
+    resumeScroll(scrollMemory?.top);
     return;
   }
   document.documentElement.dataset.locked = "1";
@@ -503,6 +511,7 @@ export async function openDomain(options: {
     pinTop();
     delete document.documentElement.dataset.locked;
   }
+  resumeScroll(0);
 }
 
 async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void) {
@@ -513,6 +522,7 @@ async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void)
   } catch {
     /* ignore */
   }
+  pauseScroll();
   const onHome = /\/maquette-dieteticien\/?$/.test(window.location.pathname);
   if (!onHome) pinTop();
   const viewNow = measureViewport();
@@ -535,6 +545,8 @@ async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void)
       source: image,
       from: { top: 0, left: 0, width: viewNext.width, height: viewNext.height },
       to: pill.getBoundingClientRect(),
+      fromRadius: 0,
+      toRadius: cornerRadius(pill),
       view: viewNext,
     });
     restoreScroll();
@@ -542,6 +554,7 @@ async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void)
     layer.remove();
     finish();
     restoreScroll();
+    resumeScroll(scrollMemory?.top);
   }
 }
 

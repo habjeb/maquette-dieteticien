@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { flipBusy, returnFromPop } from "./fx/domainFlip";
+import { scrollToTarget } from "./fx/motion";
 import { normalizePath } from "./lib/paths";
 
 type RouteValue = {
@@ -47,14 +48,18 @@ export function RouteProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const flip = document.documentElement.dataset.flip;
     if (flip === "close") return;
-    const hash = window.location.hash.replace(/^#/, "");
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const behavior: ScrollBehavior = reduce || flip === "open" ? "auto" : "smooth";
-    if (hash) {
-      document.getElementById(hash)?.scrollIntoView({ behavior, block: "start" });
+    if (flip === "open") {
+      window.scrollTo(0, 0);
       return;
     }
-    window.scrollTo({ top: 0, behavior });
+    const hash = window.location.hash.replace(/^#/, "");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (hash) {
+      const target = document.getElementById(hash);
+      if (target) scrollToTarget(target, reduce);
+      return;
+    }
+    scrollToTarget(0, reduce);
     document.getElementById("contenu")?.focus({ preventScroll: true });
   }, [key]);
 

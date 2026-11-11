@@ -1,4 +1,5 @@
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useState } from "react";
+import { resyncReveals } from "../fx/motion";
 import { sitePath } from "../lib/paths";
 import { A } from "../router";
 
@@ -14,6 +15,9 @@ export function FaqList({
 }) {
   const [open, setOpen] = useState<string | null>(null);
   const baseId = useId();
+  useLayoutEffect(() => {
+    resyncReveals();
+  });
   return (
     <div className="faq-list">
       {items.map((item) => {
@@ -30,7 +34,9 @@ export function FaqList({
                 aria-controls={panelId}
                 onClick={() => setOpen(expanded ? null : item.id)}
               >
-                <span>{item.q}</span>
+                <span className="faq-q" data-reveal="title">
+                  {item.q}
+                </span>
                 <span className="faq-symbol" aria-hidden="true">
                   {expanded ? "–" : "+"}
                 </span>

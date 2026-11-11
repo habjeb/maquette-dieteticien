@@ -1,22 +1,12 @@
-import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { mountHomeMotion, resyncReveals } from "../fx/motion";
 import { FaqList } from "../components/FaqList";
 import { BookLink, Photo } from "../components/ui";
 import { domains, faq, heroText, heroTitle, photos, steps } from "../content/editorial";
 import { openDomain, syncPillWindows } from "../fx/domainFlip";
-import { sitePath } from "../lib/paths";
+import { publicAsset, sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
-
-const tickerWords = [
-  "Visio partout en France",
-  "Déplacement secteur Condrieu",
-  "Suivi personnalisé",
-  "Nutrition sportive",
-  "Pathologies",
-  "Équilibre alimentaire",
-  "Bilan 60 minutes",
-  "Suivi 30 à 45 minutes",
-] as const;
 
 const markers = [
   "Visioconférence partout en France",
@@ -31,10 +21,16 @@ const markers = [
 ] as const;
 
 export function HomePage() {
+  useLayoutEffect(() => {
+    resyncReveals();
+  });
+  useEffect(() => {
+    mountHomeMotion();
+  }, []);
   return (
     <div className="home">
       <Hero />
-      <Ticker />
+      <Sectors />
       <Statement />
       <About />
       <Consultations />
@@ -73,82 +69,20 @@ function Reveal({ children, className = "" }: { children: ReactNode; className?:
 }
 
 function Hero() {
-  const { navigate } = useRoute();
-  useLayoutEffect(() => {
-    const update = () => syncPillWindows();
-    update();
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, { passive: true });
-    const row = document.querySelector(".pill-row");
-    row?.addEventListener("scroll", update, { passive: true });
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update);
-      row?.removeEventListener("scroll", update);
-    };
-  }, []);
-
   return (
     <section className="home-hero" id="accueil">
       <div className="container home-hero-grid">
         <Reveal>
-          <h1>{heroTitle}</h1>
-          <p className="lede home-hero-lede">{heroText}</p>
+          <h1 data-reveal="title" data-reveal-after="intro">
+            {heroTitle}
+          </h1>
+          <p className="lede home-hero-lede" data-reveal="lines" data-reveal-after="intro">
+            {heroText}
+          </p>
         </Reveal>
         <Reveal className="home-hero-photo">
           <Photo {...photos.hero} priority />
         </Reveal>
-      </div>
-      <div className="container" id="accompagnements">
-        <div className="pill-row">
-          {domains.map((domain) => {
-            const href = sitePath(domain.path);
-            return (
-              <article className="pill-card" key={domain.id}>
-                <A
-                  className="pill-hit"
-                  href={href}
-                  onClick={(event) => {
-                    const media = event.currentTarget.querySelector(".pill-media");
-                    if (!(media instanceof HTMLElement)) return;
-                    event.preventDefault();
-                    void openDomain({ id: domain.id, source: media, href, navigate });
-                  }}
-                >
-                  <span className="pill-media" data-pill={domain.id}>
-                    <Photo {...domain.photo} />
-                  </span>
-                  <span className="pill-copy">
-                    <h3>{domain.title}</h3>
-                    <p>{domain.summary}</p>
-                  </span>
-                </A>
-              </article>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Ticker() {
-  const line = [...tickerWords, ...tickerWords];
-  return (
-    <section className="ticker" aria-label="Repères de la pratique">
-      <div className="ticker-row">
-        <ul className="ticker-track">
-          {line.map((word, index) => (
-            <li key={`a-${word}-${index}`}>{word}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="ticker-row">
-        <ul className="ticker-track ticker-track-back" aria-hidden="true">
-          {line.map((word, index) => (
-            <li key={`b-${word}-${index}`}>{word}</li>
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -159,11 +93,102 @@ function Statement() {
     <section className="home-statement">
       <div className="container">
         <Reveal>
-          <p>Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent.</p>
+          <p data-reveal="lines">
+            Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent.
+          </p>
           <A className="btn btn-primary" href={`${sitePath("/")}#accompagnements`}>
             Découvrir les accompagnements
           </A>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Sectors() {
+  const { navigate } = useRoute();
+  const [active, setActive] = useState(0);
+  const scroller = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const update = () => syncPillWindows();
+    update();
+    const row = scroller.current;
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, { passive: true });
+    row?.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update);
+      row?.removeEventListener("scroll", update);
+    };
+  }, []);
+
+  return (
+    <section className="sector-stage" id="accompagnements" aria-labelledby="secteurs-titre">
+      <h2 id="secteurs-titre" className="sr-only">
+        Domaines d’accompagnement
+      </h2>
+      <div className="sector-bgs" aria-hidden="true">
+        {domains.map((domain, index) => (
+          <img
+            key={domain.id}
+            className={index === active ? "is-on" : ""}
+            src={publicAsset(domain.photo.src)}
+            alt=""
+          />
+        ))}
+      </div>
+      <div
+        className="sector-cards"
+        ref={scroller}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+          event.preventDefault();
+          const next = event.key === "ArrowRight" ? (active + 1) % domains.length : (active + domains.length - 1) % domains.length;
+          setActive(next);
+          const card = scroller.current?.querySelectorAll<HTMLElement>(".sector-card")[next];
+          card?.querySelector<HTMLElement>("a")?.focus();
+        }}
+      >
+        {domains.map((domain, index) => {
+          const href = sitePath(domain.path);
+          const opened = index === active;
+          return (
+            <article
+              className={`sector-card${opened ? " is-active" : ""}`}
+              key={domain.id}
+              data-pill={domain.id}
+              onMouseEnter={() => setActive(index)}
+              onFocus={() => setActive(index)}
+            >
+              <div className="sector-body">
+                <h3>{domain.title}</h3>
+                <p>{domain.summary}</p>
+                <span className="sector-rule" aria-hidden="true" />
+                <A
+                  className="sector-link"
+                  href={href}
+                  aria-label={`Découvrir ${domain.title}`}
+                  onClick={(event) => {
+                    const card = event.currentTarget.closest(".sector-card");
+                    if (!(card instanceof HTMLElement)) return;
+                    event.preventDefault();
+                    void openDomain({ id: domain.id, source: card, href, navigate });
+                  }}
+                >
+                  <span>Découvrir</span>
+                  <span className="sector-arrow" aria-hidden="true">
+                    →
+                  </span>
+                </A>
+              </div>
+              <span className="pill-media sector-zoom">
+                <Photo {...domain.photo} />
+              </span>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -174,9 +199,9 @@ function About() {
     <section className="home-split" id="a-propos">
       <div className="container">
         <Reveal className="home-split-head">
-          <h2>Un conseil alimentaire doit avoir sa place dans votre quotidien.</h2>
+          <h2 data-reveal="title">Un conseil alimentaire doit avoir sa place dans votre quotidien.</h2>
           <div>
-            <p>
+            <p data-reveal="lines">
               Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace à
               domicile dans la région sud lyonnaise.
             </p>
@@ -257,8 +282,8 @@ function Consultations() {
     <section className="home-offers" id="consultations">
       <div className="container">
         <Reveal className="home-offers-head">
-          <h2>Modalités de consultation</h2>
-          <p>{tariffSentence}</p>
+          <h2 data-reveal="title">Modalités de consultation</h2>
+          <p data-reveal="lines">{tariffSentence}</p>
         </Reveal>
         <div className="home-offers-grid" data-booking-visible>
           {groups.map((group) => (
@@ -289,8 +314,8 @@ function CallBand() {
       <div className="container home-call-grid">
         <Reveal>
           <p className="home-call-kicker">Rendez-vous</p>
-          <h2>Prendre rendez-vous</h2>
-          <p>
+          <h2 data-reveal="title">Prendre rendez-vous</h2>
+          <p data-reveal="lines">
             {site.practiceLine} {tariffSentence} {site.privacyNote}
           </p>
           <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-light">
@@ -301,14 +326,6 @@ function CallBand() {
           <Photo {...photos.portrait} />
         </Reveal>
       </div>
-      <div className="home-call-line" aria-hidden="true">
-        <span>Prendre rendez-vous</span>
-        <span>Visio</span>
-        <span>Déplacement</span>
-        <span>Prendre rendez-vous</span>
-        <span>Visio</span>
-        <span>Déplacement</span>
-      </div>
     </section>
   );
 }
@@ -318,8 +335,10 @@ function Markers() {
     <section className="home-markers" aria-labelledby="reperes-titre">
       <div className="container">
         <Reveal className="home-split-head">
-          <h2 id="reperes-titre">Repères de la pratique</h2>
-          <p>
+          <h2 id="reperes-titre" data-reveal="title">
+            Repères de la pratique
+          </h2>
+          <p data-reveal="lines">
             Uniquement ce qui est déjà indiqué sur le site. Les diplômes, numéros et logos encore entre crochets ne
             sont pas présentés ici comme des certifications.
           </p>
@@ -339,8 +358,10 @@ function Faq() {
     <section className="home-faq" id="faq">
       <div className="container faq-layout">
         <Reveal>
-          <h2>Questions fréquentes</h2>
-          <p>Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire.</p>
+          <h2 data-reveal="title">Questions fréquentes</h2>
+          <p data-reveal="lines">
+            Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire.
+          </p>
         </Reveal>
         <FaqList items={faq} />
       </div>
