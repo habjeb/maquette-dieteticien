@@ -8,11 +8,12 @@ import {
   type AnchorHTMLAttributes,
   type ReactNode,
 } from "react";
+import { flipBusy, returnFromPop } from "./fx/domainFlip";
 import { normalizePath } from "./lib/paths";
 
 type RouteValue = {
   path: string;
-  navigate: (href: string) => void;
+  navigate: (href: string, state?: unknown) => void;
 };
 
 const RouteContext = createContext<RouteValue | null>(null);
@@ -26,15 +27,29 @@ export function RouteProvider({ children }: { children: ReactNode }) {
   const path = normalizePath(key.split("#")[0] || "/");
 
   useEffect(() => {
-    const sync = () => setKey(locationKey());
+    const sync = () => {
+      if (flipBusy()) {
+        setKey(locationKey());
+        return;
+      }
+      const next = normalizePath(window.location.pathname);
+      const hero = document.querySelector("[data-domain-hero]");
+      if (hero && next === "/") {
+        returnFromPop(() => setKey(locationKey()));
+        return;
+      }
+      setKey(locationKey());
+    };
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
   }, []);
 
   useEffect(() => {
+    const flip = document.documentElement.dataset.flip;
+    if (flip === "close") return;
     const hash = window.location.hash.replace(/^#/, "");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+    const behavior: ScrollBehavior = reduce || flip === "open" ? "auto" : "smooth";
     if (hash) {
       document.getElementById(hash)?.scrollIntoView({ behavior, block: "start" });
       return;
@@ -43,9 +58,9 @@ export function RouteProvider({ children }: { children: ReactNode }) {
     document.getElementById("contenu")?.focus({ preventScroll: true });
   }, [key]);
 
-  const navigate = useCallback((href: string) => {
+  const navigate = useCallback((href: string, state?: unknown) => {
     const url = new URL(href, window.location.origin);
-    window.history.pushState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    window.history.pushState(state ?? {}, "", `${url.pathname}${url.search}${url.hash}`);
     setKey(locationKey());
   }, []);
 
