@@ -1,7 +1,8 @@
+import { useLayoutEffect } from "react";
 import { FaqList } from "../components/FaqList";
 import { BookLink, Photo, SectionHead } from "../components/ui";
 import { domains, faq, heroText, photos, steps } from "../content/editorial";
-import { openDomain } from "../fx/domainFlip";
+import { openDomain, syncPillWindows } from "../fx/domainFlip";
 import { sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
@@ -50,6 +51,19 @@ function Hero() {
 
 function Domaines() {
   const { navigate } = useRoute();
+  useLayoutEffect(() => {
+    const update = () => syncPillWindows();
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, { passive: true });
+    const row = document.querySelector(".pill-row");
+    row?.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update);
+      row?.removeEventListener("scroll", update);
+    };
+  }, []);
   return (
     <section className="section" id="accompagnements">
       <div className="container">

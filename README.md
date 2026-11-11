@@ -57,7 +57,7 @@ La recherche Pexels « Lyon hôpital » a servi de point de départ pour le cadr
 - `/pathologies-nutrition-therapeutique/`
 - `/nutrition-sportive/`
 
-Depuis l’accueil, les trois accompagnements sont des gélules. Le clic agrandit la photo en plein écran sur la page courante (environ 0,9 s), puis ouvre la page dédiée. Une ondulation WebGL discrète est chargée à la demande et détruite à la fin. `prefers-reduced-motion` ou un appareil très limité se replient sur un fondu.
+Depuis l’accueil, les trois accompagnements sont des gélules. Chaque photo est une fenêtre sur le cadrage plein écran. Le clic ouvre cette fenêtre depuis la gélule (clip-path, environ 1 s), puis affiche la page dédiée sur le même cadrage. Une ondulation WebGL discrète est chargée à la demande et détruite à la fin. `prefers-reduced-motion` ou un appareil très limité se replient sur un fondu.
 - `/mentions-legales/`
 - `/politique-de-confidentialite/`
 - `/cgv/`

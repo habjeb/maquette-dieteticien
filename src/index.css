@@ -361,13 +361,26 @@ body.nav-open { overflow: hidden; }
 .pill-card { scroll-snap-align: center; min-width: 0; }
 .pill-hit { display: block; color: inherit; text-decoration: none; }
 .pill-media {
+  position: relative;
   display: block;
   height: 430px;
   border-radius: 999px;
   overflow: hidden;
   background: var(--sage);
+  contain: paint;
 }
-.pill-media img { width: 100%; height: 100%; object-fit: cover; }
+.pill-media img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.15);
+  transform-origin: center center;
+}
 .pill-hit h3 { margin: 0.9rem 0 0.35rem; }
 .pill-card p { margin: 0; font-size: 0.95rem; }
 .pill-row.is-dimmed { opacity: 0.28; transition: opacity 0.35s ease; }
@@ -628,6 +641,8 @@ body.nav-open { overflow: hidden; }
 .flip-layer {
   position: fixed;
   z-index: 65;
+  top: 0;
+  left: 0;
   overflow: hidden;
   margin: 0;
   background: var(--sage);
@@ -641,7 +656,12 @@ body.nav-open { overflow: hidden; }
   height: 100%;
   display: block;
 }
-.flip-layer img { object-fit: cover; }
+.flip-layer img {
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.15);
+  transform-origin: center center;
+}
 .flip-layer canvas { object-fit: fill; }
 html.is-zooming,
 html[data-flip] { scroll-behavior: auto !important; }
