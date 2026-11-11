@@ -200,6 +200,7 @@ a:hover { color: var(--forest-deep); }
   place-items: center;
   background: var(--forest-deep);
   color: var(--ivory);
+  pointer-events: none;
 }
 .home-intro-mark {
   font-family: var(--display);

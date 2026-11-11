@@ -93,7 +93,11 @@ function revealLines(el: HTMLElement, duration: number, stagger: number) {
       duration,
       ease: EASE,
       stagger,
-      scrollTrigger: { trigger: el, start: "top 88%" },
+      scrollTrigger: {
+        trigger: el,
+        start: "top 88%",
+        onLeave: (self) => self.animation?.progress(1),
+      },
     },
   );
 }
@@ -109,7 +113,11 @@ function revealImage(figure: HTMLElement) {
       yPercent: 0,
       duration: 1.6,
       ease: EASE,
-      scrollTrigger: { trigger: figure, start: "top 86%" },
+      scrollTrigger: {
+        trigger: figure,
+        start: "top 86%",
+        onLeave: (self) => self.animation?.progress(1),
+      },
     },
   );
   if (!finePointer()) return;
@@ -250,7 +258,17 @@ export function mountHomeMotion() {
     gsap.fromTo(
       el,
       { y: 40, autoAlpha: 0 },
-      { y: 0, autoAlpha: 1, duration: 0.8, ease: EASE, scrollTrigger: { trigger: el, start: "top 92%" } },
+      {
+        y: 0,
+        autoAlpha: 1,
+        duration: 0.8,
+        ease: EASE,
+        scrollTrigger: {
+          trigger: el,
+          start: "top 92%",
+          onLeave: (self) => self.animation?.progress(1),
+        },
+      },
     );
   });
   driveTicker();
