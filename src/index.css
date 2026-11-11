@@ -380,6 +380,7 @@ body.nav-open { overflow: hidden; }
   object-position: center center;
   transform: scale(1.15);
   transform-origin: center center;
+  pointer-events: none;
 }
 .pill-hit h3 { margin: 0.9rem 0 0.35rem; }
 .pill-card p { margin: 0; font-size: 0.95rem; }
@@ -647,6 +648,7 @@ body.nav-open { overflow: hidden; }
   margin: 0;
   background: var(--sage);
   pointer-events: none;
+  -webkit-clip-path: inset(0 round 0);
 }
 .flip-layer img,
 .flip-layer canvas {
@@ -716,6 +718,10 @@ html.is-zooming:not([data-flip]) .book-bar {
   *, *::before, *::after {
     animation: none !important;
     transition: none !important;
+  }
+  .flip-layer, .flip-layer * {
+    animation: unset !important;
+    transition: unset !important;
   }
 }
 
