@@ -1,9 +1,10 @@
 import { FaqList } from "../components/FaqList";
 import { BookLink, Photo, SectionHead } from "../components/ui";
 import { domains, faq, heroText, photos, steps } from "../content/editorial";
+import { openDomain } from "../fx/domainFlip";
 import { sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
-import { A } from "../router";
+import { A, useRoute } from "../router";
 
 export function HomePage() {
   return (
@@ -48,6 +49,7 @@ function Hero() {
 }
 
 function Domaines() {
+  const { navigate } = useRoute();
   return (
     <section className="section" id="accompagnements">
       <div className="container">
@@ -55,23 +57,30 @@ function Domaines() {
           title="Domaines d’accompagnement"
           intro="Chaque accompagnement commence par un échange sur vos habitudes, vos besoins et vos objectifs. Ensemble, nous définissons des repères que vous pouvez appliquer au quotidien."
         />
-        <div className="domain-list">
-          {domains.map((domain) => (
-            <article className="domain" id={`detail-${domain.id}`} key={domain.id}>
-              <figure className="domain-media">
-                <Photo {...domain.photo} />
-              </figure>
-              <div className="domain-body">
-                <h3>
-                  <A href={sitePath(domain.path)}>{domain.title}</A>
-                </h3>
-                <p>{domain.summary}</p>
-                <A className="more" href={sitePath(domain.path)}>
-                  Voir l’accompagnement
+        <div className="pill-row">
+          {domains.map((domain) => {
+            const href = sitePath(domain.path);
+            return (
+              <article className="pill-card" key={domain.id}>
+                <A
+                  className="pill-hit"
+                  href={href}
+                  onClick={(event) => {
+                    const media = event.currentTarget.querySelector(".pill-media");
+                    if (!(media instanceof HTMLElement)) return;
+                    event.preventDefault();
+                    void openDomain({ id: domain.id, source: media, href, navigate });
+                  }}
+                >
+                  <span className="pill-media" data-pill={domain.id}>
+                    <Photo {...domain.photo} />
+                  </span>
+                  <h3>{domain.title}</h3>
                 </A>
-              </div>
-            </article>
-          ))}
+                <p>{domain.summary}</p>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
