@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { mountHomeMotion } from "../fx/motion";
 import { FaqList } from "../components/FaqList";
 import { BookLink, Photo } from "../components/ui";
 import { domains, faq, heroText, heroTitle, photos, steps } from "../content/editorial";
 import { openDomain, syncPillWindows } from "../fx/domainFlip";
-import { sitePath } from "../lib/paths";
+import { publicAsset, sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
 
@@ -40,6 +40,7 @@ export function HomePage() {
       <Hero />
       <Ticker />
       <Statement />
+      <Sectors />
       <About />
       <Consultations />
       <CallBand />
@@ -168,6 +169,88 @@ function Statement() {
             Découvrir les accompagnements
           </A>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Sectors() {
+  const { navigate } = useRoute();
+  const [active, setActive] = useState(0);
+  const scroller = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const row = scroller.current;
+    if (!row) return;
+    const update = () => syncPillWindows();
+    row.addEventListener("scroll", update, { passive: true });
+    return () => row.removeEventListener("scroll", update);
+  }, []);
+
+  return (
+    <section className="sector-stage" aria-labelledby="secteurs-titre">
+      <h2 id="secteurs-titre" className="sr-only">
+        Domaines d’accompagnement
+      </h2>
+      <div className="sector-bgs" aria-hidden="true">
+        {domains.map((domain, index) => (
+          <img
+            key={domain.id}
+            className={index === active ? "is-on" : ""}
+            src={publicAsset(domain.photo.src)}
+            alt=""
+          />
+        ))}
+      </div>
+      <div
+        className="sector-cards"
+        ref={scroller}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+          event.preventDefault();
+          const next = event.key === "ArrowRight" ? (active + 1) % domains.length : (active + domains.length - 1) % domains.length;
+          setActive(next);
+          const card = scroller.current?.querySelectorAll<HTMLElement>(".sector-card")[next];
+          card?.querySelector<HTMLElement>("a")?.focus();
+        }}
+      >
+        {domains.map((domain, index) => {
+          const href = sitePath(domain.path);
+          const opened = index === active;
+          return (
+            <article
+              className={`sector-card${opened ? " is-active" : ""}`}
+              key={domain.id}
+              onMouseEnter={() => setActive(index)}
+              onFocus={() => setActive(index)}
+            >
+              <div className="sector-body">
+                <h3>{domain.title}</h3>
+                <p>{domain.summary}</p>
+                <span className="sector-rule" aria-hidden="true" />
+                <A
+                  className="sector-link pill-hit"
+                  href={href}
+                  aria-label={`Découvrir ${domain.title}`}
+                  onClick={(event) => {
+                    const media = event.currentTarget.closest(".sector-card")?.querySelector(".pill-media");
+                    if (!(media instanceof HTMLElement)) return;
+                    event.preventDefault();
+                    void openDomain({ id: domain.id, source: media, href, navigate });
+                  }}
+                >
+                  <span>Découvrir</span>
+                  <span className="sector-arrow" aria-hidden="true">
+                    →
+                  </span>
+                </A>
+              </div>
+              <span className="pill-media sector-zoom" data-pill={domain.id}>
+                <Photo {...domain.photo} />
+              </span>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

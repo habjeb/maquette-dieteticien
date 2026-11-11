@@ -252,7 +252,7 @@ export function mountHomeMotion() {
   }
   playIntro();
   headerMotion();
-  root.querySelectorAll<HTMLElement>("h1, h2, .home-statement p").forEach((el) => revealLines(el, el.tagName === "H1" ? 1.4 : 1.2, 0.05));
+  root.querySelectorAll<HTMLElement>("h1, h2:not(.sr-only), .home-statement p").forEach((el) => revealLines(el, el.tagName === "H1" ? 1.4 : 1.2, 0.05));
   root.querySelectorAll<HTMLElement>(".home-hero-photo, .home-call-photo, .portrait").forEach(revealImage);
   gsap.utils.toArray<HTMLElement>(".home-offer, .home-marker-grid li, .faq-item, .home-split-row").forEach((el) => {
     gsap.fromTo(
