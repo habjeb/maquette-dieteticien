@@ -57,7 +57,7 @@ La recherche Pexels « Lyon hôpital » a servi de point de départ pour le cadr
 - `/pathologies-nutrition-therapeutique/`
 - `/nutrition-sportive/`
 
-Depuis l’accueil, les trois accompagnements sont des gélules. Chaque photo est une fenêtre sur le cadrage plein écran. Le clic ouvre cette fenêtre depuis la gélule (clip-path, environ 1 s), puis affiche la page dédiée sur le même cadrage. Une ondulation WebGL discrète est chargée à la demande et détruite à la fin. `prefers-reduced-motion` ou un appareil très limité se replient sur un fondu.
+Depuis l’accueil, les trois accompagnements sont des gélules. Chaque photo est une fenêtre sur le cadrage plein écran. Le clic, le titre ou le texte ouvrent cette fenêtre depuis la gélule (clip-path, ou un calque fixe avec rayon si le clip-path ne s’anime pas). L’animation dure environ 1 s, 0,7 s si les animations du système sont réduites. La croix et le retour du navigateur referment vers la même position de défilement. Une ondulation WebGL discrète est chargée à la demande et détruite à la fin. Elle est absente quand les animations sont réduites.
 - `/mentions-legales/`
 - `/politique-de-confidentialite/`
 - `/cgv/`

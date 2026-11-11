@@ -90,8 +90,8 @@ function Domaines() {
                     <Photo {...domain.photo} />
                   </span>
                   <h3>{domain.title}</h3>
+                  <p>{domain.summary}</p>
                 </A>
-                <p>{domain.summary}</p>
               </article>
             );
           })}
