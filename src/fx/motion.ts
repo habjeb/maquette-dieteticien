@@ -45,61 +45,193 @@ export function scrollToTarget(target: number | Element, immediate = false) {
   else target.scrollIntoView({ block: "start", behavior: immediate ? "auto" : "smooth" });
 }
 
-function splitLines(el: HTMLElement) {
-  if (el.dataset.lines === "1" || el.children.length > 0) return [] as HTMLElement[];
-  const words = (el.textContent || "").trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return [];
-  el.textContent = "";
-  const spans = words.map((word, index) => {
-    const span = document.createElement("span");
-    span.textContent = index === words.length - 1 ? word : `${word} `;
-    span.style.display = "inline";
-    el.appendChild(span);
-    return span;
+type RevealMode = "title" | "lines";
+
+type RevealItem = {
+  el: HTMLElement;
+  mode: RevealMode;
+  intro: boolean;
+  revealed: boolean;
+  tween?: gsap.core.Tween;
+  trigger?: ScrollTrigger;
+};
+
+const revealItems: RevealItem[] = [];
+let introWait = 0;
+let resizeTimer = 0;
+let revealsReady = false;
+
+function sourceText(el: HTMLElement) {
+  const stored = el.dataset.revealText;
+  if (stored) return stored;
+  const text = (el.textContent || "").replace(/\s+/g, " ").trim();
+  el.dataset.revealText = text;
+  return text;
+}
+
+function splitReveal(el: HTMLElement, mode: RevealMode) {
+  const text = sourceText(el);
+  const words = text.split(" ").filter(Boolean);
+  const sr = document.createElement("span");
+  sr.className = "sr-only";
+  sr.textContent = text;
+  if (words.length === 0) {
+    el.replaceChildren(sr);
+    return [] as HTMLElement[];
+  }
+
+  const measure = document.createElement("span");
+  measure.className = "reveal-measure";
+  const wordMasks = words.map((word) => {
+    const wordMask = document.createElement("span");
+    wordMask.className = "word-mask";
+    const inner = document.createElement("span");
+    inner.className = "line-inner";
+    inner.textContent = word;
+    wordMask.appendChild(inner);
+    return wordMask;
   });
-  const groups: HTMLSpanElement[][] = [];
+  wordMasks.forEach((wordMask, index) => {
+    measure.appendChild(wordMask);
+    if (index < wordMasks.length - 1) {
+      const gap = document.createElement("span");
+      gap.className = "word-gap";
+      gap.textContent = " ";
+      measure.appendChild(gap);
+    }
+  });
+  el.replaceChildren(measure);
+
+  const groups: HTMLElement[][] = [];
   let last = -1;
-  spans.forEach((span) => {
-    const top = span.offsetTop;
-    if (groups.length === 0 || Math.abs(top - last) > 2) {
-      groups.push([span]);
+  wordMasks.forEach((wordMask) => {
+    const top = wordMask.offsetTop;
+    if (groups.length === 0 || top - last > 3) {
+      groups.push([wordMask]);
       last = top;
-    } else groups[groups.length - 1].push(span);
+    } else groups[groups.length - 1].push(wordMask);
   });
+
+  const visual = document.createElement("span");
+  visual.className = "reveal-visual";
+  visual.setAttribute("aria-hidden", "true");
   const inners: HTMLElement[] = [];
-  el.replaceChildren();
   groups.forEach((group) => {
     const mask = document.createElement("span");
     mask.className = "line-mask";
-    const inner = document.createElement("span");
-    inner.className = "line-inner";
-    group.forEach((span) => inner.appendChild(span));
-    mask.appendChild(inner);
-    el.appendChild(mask);
-    inners.push(inner);
+    if (mode === "lines") {
+      const inner = document.createElement("span");
+      inner.className = "line-inner";
+      inner.textContent = group.map((wordMask) => wordMask.textContent || "").join(" ");
+      mask.appendChild(inner);
+      inners.push(inner);
+    } else {
+      group.forEach((wordMask, index) => {
+        mask.appendChild(wordMask);
+        const inner = wordMask.querySelector<HTMLElement>(".line-inner");
+        if (inner) inners.push(inner);
+        if (index < group.length - 1) {
+          const gap = document.createElement("span");
+          gap.className = "word-gap";
+          gap.textContent = " ";
+          mask.appendChild(gap);
+        }
+      });
+    }
+    visual.appendChild(mask);
   });
-  el.dataset.lines = "1";
+  el.replaceChildren(sr, visual);
   return inners;
 }
 
-function revealLines(el: HTMLElement, duration: number, stagger: number) {
-  const lines = splitLines(el);
-  if (lines.length === 0) return;
-  gsap.fromTo(
-    lines,
-    { yPercent: 110 },
+function mountReveal(item: RevealItem, first: boolean) {
+  item.trigger?.kill();
+  item.tween?.kill();
+  item.trigger = undefined;
+  item.tween = undefined;
+  const inners = splitReveal(item.el, item.mode);
+  if (inners.length === 0) return;
+  if (reduced()) {
+    gsap.set(inners, { yPercent: 0 });
+    if (item.revealed) {
+      gsap.set(item.el, { opacity: 1 });
+      return;
+    }
+    item.tween = gsap.fromTo(
+      item.el,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 0.55,
+        ease: "power1.out",
+        scrollTrigger: {
+          trigger: item.el,
+          start: "top 90%",
+          onLeave: (self) => self.animation?.progress(1),
+        },
+        onComplete: () => {
+          item.revealed = true;
+        },
+      },
+    );
+    item.trigger = item.tween.scrollTrigger || undefined;
+    return;
+  }
+  if (item.revealed) {
+    gsap.set(inners, { yPercent: 0 });
+    return;
+  }
+  item.tween = gsap.fromTo(
+    inners,
+    { yPercent: 115 },
     {
       yPercent: 0,
-      duration,
+      duration: item.mode === "title" ? 1.4 : 1.2,
       ease: EASE,
-      stagger,
+      stagger: 0.05,
+      delay: item.intro && first ? introWait : 0,
       scrollTrigger: {
-        trigger: el,
-        start: "top 88%",
-        onLeave: (self) => self.animation?.progress(1),
+        trigger: item.el,
+        start: "top 84%",
+        onLeave: (self) => {
+          self.animation?.progress(1);
+          item.revealed = true;
+        },
+      },
+      onComplete: () => {
+        item.revealed = true;
       },
     },
   );
+  item.trigger = item.tween.scrollTrigger || undefined;
+}
+
+function bootReveals(root: ParentNode) {
+  if (revealsReady) return;
+  revealsReady = true;
+  root.querySelectorAll<HTMLElement>("[data-reveal]").forEach((el) => {
+    revealItems.push({
+      el,
+      mode: el.dataset.reveal === "title" ? "title" : "lines",
+      intro: el.dataset.revealAfter === "intro",
+      revealed: false,
+    });
+  });
+  const run = (first: boolean) => revealItems.forEach((item) => mountReveal(item, first));
+  const onResize = () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      run(false);
+      ScrollTrigger.refresh();
+    }, 180);
+  };
+  const start = () => {
+    run(true);
+    ScrollTrigger.refresh();
+    window.addEventListener("resize", onResize);
+  };
+  if (document.fonts?.ready) void document.fonts.ready.then(start);
+  else start();
 }
 
 function revealImage(figure: HTMLElement) {
@@ -128,41 +260,6 @@ function revealImage(figure: HTMLElement) {
   });
 }
 
-function driveTicker() {
-  const rows = [...document.querySelectorAll<HTMLElement>(".ticker-track")];
-  if (rows.length === 0) return;
-  document.documentElement.classList.add("ticker-driven");
-  let last = performance.now();
-  let velocity = 1;
-  let previous = window.scrollY;
-  window.addEventListener(
-    "scroll",
-    () => {
-      const delta = Math.abs(window.scrollY - previous);
-      previous = window.scrollY;
-      velocity = Math.min(3.2, Math.max(1, delta / 28));
-    },
-    { passive: true },
-  );
-  const offsets = rows.map(() => 0);
-  const tick = (now: number) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
-    last = now;
-    velocity += (1 - velocity) * 0.08;
-    rows.forEach((row, index) => {
-      const half = row.scrollWidth / 2;
-      if (half <= 0) return;
-      const direction = index === 1 ? -1 : 1;
-      const base = finePointer() ? 70 : 46;
-      offsets[index] = (offsets[index] + direction * base * velocity * dt) % half;
-      const x = offsets[index] > 0 ? offsets[index] - half : offsets[index];
-      row.style.transform = `translate3d(${x}px,0,0)`;
-    });
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
-
 function enhanceButtons(root: ParentNode) {
   root.querySelectorAll<HTMLElement>(".btn").forEach((btn) => {
     if (btn.dataset.rise === "1" || btn.querySelector("img")) return;
@@ -184,10 +281,10 @@ function enhanceButtons(root: ParentNode) {
 
 function playIntro() {
   try {
-    if (sessionStorage.getItem("nb-intro") === "1") return;
+    if (sessionStorage.getItem("nb-intro") === "1") return 0;
     sessionStorage.setItem("nb-intro", "1");
   } catch {
-    return;
+    return 0;
   }
   const overlay = document.createElement("div");
   overlay.className = "home-intro";
@@ -201,6 +298,7 @@ function playIntro() {
   tl.fromTo(mark, { scale: 0, y: 40 }, { scale: 1, y: 0, duration: 1.2, ease: "power2.inOut" });
   tl.to(mark, { y: -80, scale: 0.6, duration: 1.1, ease: EASE_IN_OUT }, 1.6);
   tl.to(overlay, { autoAlpha: 0, duration: 0.8, ease: "power1.inOut" }, 2.2);
+  return 2.45;
 }
 
 function headerMotion() {
@@ -232,29 +330,26 @@ export function mountSiteMotion() {
   lenis.on("scroll", ScrollTrigger.update);
 }
 
+export function resyncReveals() {
+  if (!revealsReady) return;
+  revealItems.forEach((item) => {
+    if (!item.el.isConnected) return;
+    if (item.el.querySelector(".reveal-visual")) return;
+    mountReveal(item, false);
+  });
+}
+
 export function mountHomeMotion() {
   const root = document.querySelector(".home");
   if (!root || homeMounted) return;
   homeMounted = true;
   enhanceButtons(document);
-  if (reduced()) {
-    gsap.fromTo(
-      root.querySelectorAll("section"),
-      { autoAlpha: 0.55 },
-      { autoAlpha: 1, duration: 0.45, stagger: 0.04, ease: "power1.out", overwrite: true },
-    );
-    return;
-  }
-  try {
-    sessionStorage.getItem("nb-intro");
-  } catch {
-    /* private mode */
-  }
-  playIntro();
-  headerMotion();
-  root.querySelectorAll<HTMLElement>("h1, h2:not(.sr-only), .home-statement p").forEach((el) => revealLines(el, el.tagName === "H1" ? 1.4 : 1.2, 0.05));
+  introWait = reduced() ? 0 : playIntro();
+  if (!reduced()) headerMotion();
+  bootReveals(root);
+  if (reduced()) return;
   root.querySelectorAll<HTMLElement>(".home-hero-photo, .home-call-photo, .portrait").forEach(revealImage);
-  gsap.utils.toArray<HTMLElement>(".home-offer, .home-marker-grid li, .faq-item, .home-split-row").forEach((el) => {
+  gsap.utils.toArray<HTMLElement>(".home-offer, .home-marker-grid li, .home-split-row").forEach((el) => {
     gsap.fromTo(
       el,
       { y: 40, autoAlpha: 0 },
@@ -271,5 +366,4 @@ export function mountHomeMotion() {
       },
     );
   });
-  driveTicker();
 }

@@ -783,10 +783,26 @@ html.is-zooming:not([data-flip]) .book-bar {
 .home h2 { font-size: clamp(1.85rem, 2.8vw, 2.75rem); margin: 0; }
 .home .lede { font-family: var(--sans); font-size: 1.05rem; max-width: 38rem; }
 
-.line-mask { display: block; overflow: hidden; }
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
 .line-inner { display: block; }
+.word-gap { display: inline-block; width: 0.3em; overflow: hidden; }
+.reveal-measure,
+.reveal-visual { display: block; }
+.faq-q { display: block; flex: 1; min-width: 0; }
 
-.home-hero { padding: 2.5rem 0 3rem; }
+.home-hero { padding: 2.5rem 0 1.5rem; }
 .home-hero-grid { display: grid; gap: 1.75rem; align-items: end; }
 .home-hero-photo { margin: 0; border-radius: 1.6rem; overflow: hidden; background: var(--sage); }
 .home-hero-photo img { width: 100%; height: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
@@ -812,52 +828,21 @@ html.is-zooming:not([data-flip]) .book-bar {
   }
 }
 @media (min-width: 900px) {
-  .home-hero { padding: 3.5rem 0 4rem; }
+  .home-hero { padding: 3.5rem 0 2rem; }
   .home-hero-grid { grid-template-columns: 1.05fr 0.95fr; gap: 3rem; align-items: center; }
   .home .pill-row { margin-top: 2.5rem; }
   .home .pill-media { height: 340px; }
 }
 
-.ticker {
-  background: #e7e1d1;
-  color: var(--ink);
-  padding: 2.4rem 0;
-  overflow: hidden;
-}
-.ticker-row { overflow: hidden; }
-.ticker-track {
-  display: flex;
-  gap: 2.4rem;
-  width: max-content;
-  margin: 0;
-  padding: 0.15rem 0;
-  list-style: none;
-}
-.ticker-track li {
-  font-family: var(--sans);
-  font-weight: 500;
-  font-size: clamp(1.45rem, 2.6vw, 2.35rem);
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-  white-space: nowrap;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ticker-track { animation: ticker 36s linear infinite; }
-  .ticker-track-back { animation-direction: reverse; animation-duration: 42s; }
-  html.ticker-driven .ticker-track { animation: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ticker-track { flex-wrap: wrap; width: min(1100px, calc(100% - 2rem)); margin-inline: auto; }
-  .ticker-track-back { display: none; }
-  .ticker-track li { white-space: normal; font-size: 1.35rem; }
-  .ticker-track li:nth-child(n + 9) { display: none; }
-}
 @keyframes ticker {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 
-.home-statement { padding: 5.5rem 0; text-align: center; }
+.home-statement { padding: 3.25rem 0 4.25rem; text-align: center; }
+@media (min-width: 900px) {
+  .home-statement { padding: 4.5rem 0 5.25rem; }
+}
 .home-statement p {
   margin: 0 auto 1.4rem;
   max-width: 38rem;

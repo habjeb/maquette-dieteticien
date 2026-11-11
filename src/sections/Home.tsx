@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
-import { mountHomeMotion } from "../fx/motion";
+import { mountHomeMotion, resyncReveals } from "../fx/motion";
 import { FaqList } from "../components/FaqList";
 import { BookLink, Photo } from "../components/ui";
 import { domains, faq, heroText, heroTitle, photos, steps } from "../content/editorial";
@@ -7,17 +7,6 @@ import { openDomain, syncPillWindows } from "../fx/domainFlip";
 import { publicAsset, sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
-
-const tickerWords = [
-  "Visio partout en France",
-  "Déplacement secteur Condrieu",
-  "Suivi personnalisé",
-  "Nutrition sportive",
-  "Pathologies",
-  "Équilibre alimentaire",
-  "Bilan 60 minutes",
-  "Suivi 30 à 45 minutes",
-] as const;
 
 const markers = [
   "Visioconférence partout en France",
@@ -32,13 +21,15 @@ const markers = [
 ] as const;
 
 export function HomePage() {
+  useLayoutEffect(() => {
+    resyncReveals();
+  });
   useEffect(() => {
     mountHomeMotion();
   }, []);
   return (
     <div className="home">
       <Hero />
-      <Ticker />
       <Statement />
       <Sectors />
       <About />
@@ -97,8 +88,12 @@ function Hero() {
     <section className="home-hero" id="accueil">
       <div className="container home-hero-grid">
         <Reveal>
-          <h1>{heroTitle}</h1>
-          <p className="lede home-hero-lede">{heroText}</p>
+          <h1 data-reveal="title" data-reveal-after="intro">
+            {heroTitle}
+          </h1>
+          <p className="lede home-hero-lede" data-reveal="lines" data-reveal-after="intro">
+            {heroText}
+          </p>
         </Reveal>
         <Reveal className="home-hero-photo">
           <Photo {...photos.hero} priority />
@@ -137,34 +132,14 @@ function Hero() {
   );
 }
 
-function Ticker() {
-  const line = [...tickerWords, ...tickerWords];
-  return (
-    <section className="ticker" aria-label="Repères de la pratique">
-      <div className="ticker-row">
-        <ul className="ticker-track">
-          {line.map((word, index) => (
-            <li key={`a-${word}-${index}`}>{word}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="ticker-row">
-        <ul className="ticker-track ticker-track-back" aria-hidden="true">
-          {line.map((word, index) => (
-            <li key={`b-${word}-${index}`}>{word}</li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
 function Statement() {
   return (
     <section className="home-statement">
       <div className="container">
         <Reveal>
-          <p>Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent.</p>
+          <p data-reveal="lines">
+            Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent.
+          </p>
           <A className="btn btn-primary" href={`${sitePath("/")}#accompagnements`}>
             Découvrir les accompagnements
           </A>
@@ -261,9 +236,9 @@ function About() {
     <section className="home-split" id="a-propos">
       <div className="container">
         <Reveal className="home-split-head">
-          <h2>Un conseil alimentaire doit avoir sa place dans votre quotidien.</h2>
+          <h2 data-reveal="title">Un conseil alimentaire doit avoir sa place dans votre quotidien.</h2>
           <div>
-            <p>
+            <p data-reveal="lines">
               Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace à
               domicile dans la région sud lyonnaise.
             </p>
@@ -344,8 +319,8 @@ function Consultations() {
     <section className="home-offers" id="consultations">
       <div className="container">
         <Reveal className="home-offers-head">
-          <h2>Modalités de consultation</h2>
-          <p>{tariffSentence}</p>
+          <h2 data-reveal="title">Modalités de consultation</h2>
+          <p data-reveal="lines">{tariffSentence}</p>
         </Reveal>
         <div className="home-offers-grid" data-booking-visible>
           {groups.map((group) => (
@@ -376,8 +351,8 @@ function CallBand() {
       <div className="container home-call-grid">
         <Reveal>
           <p className="home-call-kicker">Rendez-vous</p>
-          <h2>Prendre rendez-vous</h2>
-          <p>
+          <h2 data-reveal="title">Prendre rendez-vous</h2>
+          <p data-reveal="lines">
             {site.practiceLine} {tariffSentence} {site.privacyNote}
           </p>
           <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-light">
@@ -405,8 +380,10 @@ function Markers() {
     <section className="home-markers" aria-labelledby="reperes-titre">
       <div className="container">
         <Reveal className="home-split-head">
-          <h2 id="reperes-titre">Repères de la pratique</h2>
-          <p>
+          <h2 id="reperes-titre" data-reveal="title">
+            Repères de la pratique
+          </h2>
+          <p data-reveal="lines">
             Uniquement ce qui est déjà indiqué sur le site. Les diplômes, numéros et logos encore entre crochets ne
             sont pas présentés ici comme des certifications.
           </p>
@@ -426,8 +403,10 @@ function Faq() {
     <section className="home-faq" id="faq">
       <div className="container faq-layout">
         <Reveal>
-          <h2>Questions fréquentes</h2>
-          <p>Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire.</p>
+          <h2 data-reveal="title">Questions fréquentes</h2>
+          <p data-reveal="lines">
+            Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire.
+          </p>
         </Reveal>
         <FaqList items={faq} />
       </div>
