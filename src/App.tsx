@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { mountSiteMotion } from "./fx/motion";
 import { BookBar } from "./layout/BookBar";
 import { Footer } from "./layout/Footer";
 import { Header } from "./layout/Header";
@@ -17,6 +19,9 @@ export default function App() {
 
 function Frame() {
   const page = usePage();
+  useEffect(() => {
+    mountSiteMotion();
+  }, []);
   return (
     <>
       <Seo page={page} />

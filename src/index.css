@@ -164,6 +164,50 @@ a:hover { color: var(--forest-deep); }
 .btn-light { background: var(--ivory); color: var(--forest); }
 .btn-light:hover { background: var(--white); color: var(--forest-deep); }
 .btn-block { width: 100%; }
+.btn { position: relative; }
+.btn-rise { display: grid; position: relative; z-index: 1; }
+.btn-rise span { grid-area: 1 / 1; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn-rise span { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+  .btn-rise span:last-child { transform: translateY(110%); }
+  .btn:hover .btn-rise span:first-child,
+  .btn:focus-visible .btn-rise span:first-child { transform: translateY(-110%); opacity: 0; }
+  .btn:hover .btn-rise span:last-child,
+  .btn:focus-visible .btn-rise span:last-child { transform: translateY(0); }
+  .home .pill-media { transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+  .home .pill-card:hover .pill-media { transform: translateY(-6px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .menu-sheet .menu-links a { opacity: 0; transform: translateY(16px); }
+  .menu-sheet.is-open .menu-links a {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .menu-sheet.is-open .menu-links a:nth-child(2) { transition-delay: 0.08s; }
+  .menu-sheet.is-open .menu-links a:nth-child(3) { transition-delay: 0.16s; }
+  .menu-sheet.is-open .menu-links a:nth-child(4) { transition-delay: 0.24s; }
+  .menu-sheet.is-open .menu-links a:nth-child(5) { transition-delay: 0.32s; }
+  .menu-sheet.is-open .menu-links a:nth-child(6) { transition-delay: 0.4s; }
+  .faq-symbol { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+  .faq-item.is-open .faq-symbol { transform: rotate(45deg); }
+}
+.home-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: var(--forest-deep);
+  color: var(--ivory);
+}
+.home-intro-mark {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 4rem;
+  letter-spacing: 0.045em;
+  line-height: 1;
+}
 .btn:disabled {
   opacity: 1;
   background: transparent;
@@ -182,7 +226,9 @@ a:hover { color: var(--forest-deep); }
   background: var(--ivory);
   border-bottom: 1px solid transparent;
   padding-top: env(safe-area-inset-top);
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
+html.header-away .site-header { transform: translateY(-100%); pointer-events: none; }
 .site-header.is-scrolled { border-bottom-color: var(--line); }
 .header-bar {
   width: min(1680px, calc(100% - 2 * var(--gutter)));
@@ -736,26 +782,16 @@ html.is-zooming:not([data-flip]) .book-bar {
 .home h2 { font-size: clamp(1.85rem, 2.8vw, 2.75rem); margin: 0; }
 .home .lede { font-family: var(--sans); font-size: 1.05rem; max-width: 38rem; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(1.75rem);
-    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .reveal.is-in { opacity: 1; transform: none; }
-}
+.line-mask { display: block; overflow: hidden; }
+.line-inner { display: block; }
 
 .home-hero { padding: 2.5rem 0 3rem; }
 .home-hero-grid { display: grid; gap: 1.75rem; align-items: end; }
 .home-hero-photo { margin: 0; border-radius: 1.6rem; overflow: hidden; background: var(--sage); }
 .home-hero-photo img { width: 100%; height: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
-@media (prefers-reduced-motion: no-preference) {
-  .home-hero-photo img {
-    transform: scale(1.08);
-    transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .home-hero-photo.is-in img { transform: scale(1); }
-}
+.home-hero-photo img,
+.home-call-photo img,
+.home .portrait img { transform-origin: center center; will-change: transform; }
 .home .pill-row { margin-top: 1.5rem; }
 .home .pill-media { height: 280px; }
 .home .pill-copy { display: block; padding-top: 0.85rem; }
@@ -807,6 +843,7 @@ html.is-zooming:not([data-flip]) .book-bar {
 @media (prefers-reduced-motion: no-preference) {
   .ticker-track { animation: ticker 36s linear infinite; }
   .ticker-track-back { animation-direction: reverse; animation-duration: 42s; }
+  html.ticker-driven .ticker-track { animation: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ticker-track { flex-wrap: wrap; width: min(1100px, calc(100% - 2rem)); margin-inline: auto; }

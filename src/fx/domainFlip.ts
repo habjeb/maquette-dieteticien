@@ -1,4 +1,5 @@
 import { sitePath } from "../lib/paths";
+import { pauseScroll, resumeScroll } from "./motion";
 import type { Liquid } from "./liquid";
 
 type Mode = "full" | "plain";
@@ -414,6 +415,7 @@ export async function openDomain(options: {
     /* ignore */
   }
   rememberScroll(options.source);
+  pauseScroll();
   const heldScroll = window.scrollY;
   const keepScroll = () => {
     if (document.documentElement.dataset.zoomPhase === "run" && Math.abs(window.scrollY - heldScroll) > 1) {
@@ -447,6 +449,7 @@ export async function openDomain(options: {
     if (!coversViewport(layer, view)) {
       layer.remove();
       options.navigate(options.href, { fromPills: true, scrollY: scrollMemory?.top ?? 0 });
+      resumeScroll(0);
       return;
     }
     document.documentElement.dataset.zoomPhase = "covered";
@@ -463,6 +466,7 @@ export async function openDomain(options: {
   }
   if (generation !== pinGeneration || document.documentElement.dataset.flip === "close") {
     layer.remove();
+    resumeScroll(scrollMemory?.top);
     return;
   }
   pinTop();
@@ -474,6 +478,7 @@ export async function openDomain(options: {
   }
   if (generation !== pinGeneration || document.documentElement.dataset.flip !== "open") {
     layer.remove();
+    resumeScroll(scrollMemory?.top);
     return;
   }
   document.documentElement.dataset.locked = "1";
@@ -503,6 +508,7 @@ export async function openDomain(options: {
     pinTop();
     delete document.documentElement.dataset.locked;
   }
+  resumeScroll(0);
 }
 
 async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void) {
@@ -513,6 +519,7 @@ async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void)
   } catch {
     /* ignore */
   }
+  pauseScroll();
   const onHome = /\/maquette-dieteticien\/?$/.test(window.location.pathname);
   if (!onHome) pinTop();
   const viewNow = measureViewport();
@@ -542,6 +549,7 @@ async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void)
     layer.remove();
     finish();
     restoreScroll();
+    resumeScroll(scrollMemory?.top);
   }
 }
 

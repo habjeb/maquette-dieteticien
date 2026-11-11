@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
+import { mountHomeMotion } from "../fx/motion";
 import { FaqList } from "../components/FaqList";
 import { BookLink, Photo } from "../components/ui";
 import { domains, faq, heroText, heroTitle, photos, steps } from "../content/editorial";
@@ -31,6 +32,9 @@ const markers = [
 ] as const;
 
 export function HomePage() {
+  useEffect(() => {
+    mountHomeMotion();
+  }, []);
   return (
     <div className="home">
       <Hero />
