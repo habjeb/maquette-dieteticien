@@ -30,8 +30,8 @@ export function HomePage() {
   return (
     <div className="home">
       <Hero />
-      <Statement />
       <Sectors />
+      <Statement />
       <About />
       <Consultations />
       <CallBand />
@@ -69,21 +69,6 @@ function Reveal({ children, className = "" }: { children: ReactNode; className?:
 }
 
 function Hero() {
-  const { navigate } = useRoute();
-  useLayoutEffect(() => {
-    const update = () => syncPillWindows();
-    update();
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, { passive: true });
-    const row = document.querySelector(".pill-row");
-    row?.addEventListener("scroll", update, { passive: true });
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update);
-      row?.removeEventListener("scroll", update);
-    };
-  }, []);
-
   return (
     <section className="home-hero" id="accueil">
       <div className="container home-hero-grid">
@@ -98,35 +83,6 @@ function Hero() {
         <Reveal className="home-hero-photo">
           <Photo {...photos.hero} priority />
         </Reveal>
-      </div>
-      <div className="container" id="accompagnements">
-        <div className="pill-row">
-          {domains.map((domain) => {
-            const href = sitePath(domain.path);
-            return (
-              <article className="pill-card" key={domain.id}>
-                <A
-                  className="pill-hit"
-                  href={href}
-                  onClick={(event) => {
-                    const media = event.currentTarget.querySelector(".pill-media");
-                    if (!(media instanceof HTMLElement)) return;
-                    event.preventDefault();
-                    void openDomain({ id: domain.id, source: media, href, navigate });
-                  }}
-                >
-                  <span className="pill-media" data-pill={domain.id}>
-                    <Photo {...domain.photo} />
-                  </span>
-                  <span className="pill-copy">
-                    <h3>{domain.title}</h3>
-                    <p>{domain.summary}</p>
-                  </span>
-                </A>
-              </article>
-            );
-          })}
-        </div>
       </div>
     </section>
   );
@@ -154,16 +110,22 @@ function Sectors() {
   const [active, setActive] = useState(0);
   const scroller = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const row = scroller.current;
-    if (!row) return;
+  useLayoutEffect(() => {
     const update = () => syncPillWindows();
-    row.addEventListener("scroll", update, { passive: true });
-    return () => row.removeEventListener("scroll", update);
+    update();
+    const row = scroller.current;
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, { passive: true });
+    row?.addEventListener("scroll", update, { passive: true });
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update);
+      row?.removeEventListener("scroll", update);
+    };
   }, []);
 
   return (
-    <section className="sector-stage" aria-labelledby="secteurs-titre">
+    <section className="sector-stage" id="accompagnements" aria-labelledby="secteurs-titre">
       <h2 id="secteurs-titre" className="sr-only">
         Domaines d’accompagnement
       </h2>
@@ -196,6 +158,7 @@ function Sectors() {
             <article
               className={`sector-card${opened ? " is-active" : ""}`}
               key={domain.id}
+              data-pill={domain.id}
               onMouseEnter={() => setActive(index)}
               onFocus={() => setActive(index)}
             >
@@ -204,14 +167,14 @@ function Sectors() {
                 <p>{domain.summary}</p>
                 <span className="sector-rule" aria-hidden="true" />
                 <A
-                  className="sector-link pill-hit"
+                  className="sector-link"
                   href={href}
                   aria-label={`Découvrir ${domain.title}`}
                   onClick={(event) => {
-                    const media = event.currentTarget.closest(".sector-card")?.querySelector(".pill-media");
-                    if (!(media instanceof HTMLElement)) return;
+                    const card = event.currentTarget.closest(".sector-card");
+                    if (!(card instanceof HTMLElement)) return;
                     event.preventDefault();
-                    void openDomain({ id: domain.id, source: media, href, navigate });
+                    void openDomain({ id: domain.id, source: card, href, navigate });
                   }}
                 >
                   <span>Découvrir</span>
@@ -220,7 +183,7 @@ function Sectors() {
                   </span>
                 </A>
               </div>
-              <span className="pill-media sector-zoom" data-pill={domain.id}>
+              <span className="pill-media sector-zoom">
                 <Photo {...domain.photo} />
               </span>
             </article>
