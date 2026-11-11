@@ -361,13 +361,26 @@ body.nav-open { overflow: hidden; }
 .pill-card { scroll-snap-align: center; min-width: 0; }
 .pill-hit { display: block; color: inherit; text-decoration: none; }
 .pill-media {
+  position: relative;
   display: block;
   height: 430px;
   border-radius: 999px;
   overflow: hidden;
   background: var(--sage);
+  contain: paint;
 }
-.pill-media img { width: 100%; height: 100%; object-fit: cover; }
+.pill-media img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.15);
+  transform-origin: center center;
+}
 .pill-hit h3 { margin: 0.9rem 0 0.35rem; }
 .pill-card p { margin: 0; font-size: 0.95rem; }
 .pill-row.is-dimmed { opacity: 0.28; transition: opacity 0.35s ease; }
@@ -584,12 +597,21 @@ body.nav-open { overflow: hidden; }
 .domain-page.section { padding-top: 0; }
 .domain-stage {
   position: relative;
-  height: 100svh;
-  margin-top: calc(-1 * (var(--header) + env(safe-area-inset-top)));
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: calc(-1 * (var(--header) + env(safe-area-inset-top))) 0 0;
   background: var(--sage);
   overflow: hidden;
 }
-.domain-stage-img { width: 100%; height: 100%; object-fit: cover; }
+.domain-stage-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.15);
+  transform-origin: center center;
+}
 .domain-stage figcaption {
   position: absolute;
   left: 0;
@@ -619,6 +641,8 @@ body.nav-open { overflow: hidden; }
 .flip-layer {
   position: fixed;
   z-index: 65;
+  top: 0;
+  left: 0;
   overflow: hidden;
   margin: 0;
   background: var(--sage);
@@ -630,14 +654,36 @@ body.nav-open { overflow: hidden; }
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   display: block;
 }
+.flip-layer img {
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.15);
+  transform-origin: center center;
+}
+.flip-layer canvas { object-fit: fill; }
+html.is-zooming,
+html[data-flip] { scroll-behavior: auto !important; }
 html[data-flip],
 html[data-flip] body { overflow-anchor: none; }
-html[data-flip] .domain-after { opacity: 0; }
-html[data-reveal] .domain-after { opacity: 1; transition: opacity 0.45s ease; }
-html[data-flip] [data-domain-hero] > img { opacity: 0; }
+html[data-flip="open"][data-locked] { overflow: hidden; }
+html[data-flip="open"] .domain-after,
+html[data-flip="open"] .site-header,
+html[data-flip="open"] .site-footer,
+html[data-flip="open"] .book-bar { opacity: 0; }
+html[data-reveal] .domain-after,
+html[data-reveal] .site-header,
+html[data-reveal] .site-footer,
+html[data-reveal] .book-bar { opacity: 1; transition: opacity 0.45s ease; }
+html.is-zooming:not([data-flip]) main,
+html.is-zooming:not([data-flip]) .site-header,
+html.is-zooming:not([data-flip]) .site-footer,
+html.is-zooming:not([data-flip]) .book-bar {
+  opacity: 0.28;
+  transform: scale(0.985);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0.4s;

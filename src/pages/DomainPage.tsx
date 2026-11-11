@@ -17,7 +17,7 @@ export function DomainPage({ id }: { id: DomainId }) {
 
   return (
     <article className="section domain-page">
-      <figure className="domain-stage" data-domain-hero={domain.id}>
+      <figure className="domain-stage" data-domain-hero={domain.id} data-booking-visible>
         <Photo {...domain.photo} priority className="domain-stage-img" />
         <figcaption className="domain-after">
           <p className="kicker kicker-on-dark">Accompagnement</p>

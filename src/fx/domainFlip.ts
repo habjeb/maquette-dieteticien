@@ -3,7 +3,9 @@ import type { Liquid } from "./liquid";
 
 type Mode = "full" | "fade" | "none";
 
-type Rect = { top: number; left: number; width: number; height: number };
+const SCALE = 1.15;
+const DURATION = 1000;
+const EASING = "cubic-bezier(0.25, 0.1, 0.2, 1)";
 
 let busy = false;
 
@@ -20,10 +22,6 @@ function mode(): Mode {
   return "full";
 }
 
-function ease(t: number) {
-  return 1 - (1 - t) ** 4;
-}
-
 function wait(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
@@ -32,53 +30,86 @@ function frame() {
   return new Promise((resolve) => window.requestAnimationFrame(resolve));
 }
 
-async function waitFor(selector: string) {
-  const start = performance.now();
-  while (performance.now() - start < 1200) {
-    const node = document.querySelector<HTMLElement>(selector);
-    if (node && node.getBoundingClientRect().width > 0) return node;
-    await frame();
+function measureViewport() {
+  const width = document.documentElement.clientWidth;
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:fixed;left:0;top:0;width:100%;height:100dvh;visibility:hidden;pointer-events:none;";
+  document.body.appendChild(probe);
+  const height = probe.getBoundingClientRect().height;
+  probe.remove();
+  return { width, height };
+}
+
+function coverCrop(boxW: number, boxH: number, imgW: number, imgH: number, scale: number): [number, number, number, number] {
+  if (boxW <= 0 || boxH <= 0 || imgW <= 0 || imgH <= 0) return [0, 0, 1, 1];
+  const box = boxW / boxH;
+  const img = imgW / imgH;
+  let u0 = 0;
+  let v0 = 0;
+  let u1 = 1;
+  let v1 = 1;
+  if (img > box) {
+    const visible = box / img;
+    u0 = (1 - visible) / 2;
+    u1 = u0 + visible;
+  } else {
+    const visible = img / box;
+    v0 = (1 - visible) / 2;
+    v1 = v0 + visible;
   }
-  return null;
+  const zoom = Math.max(scale, 0.01);
+  const cu = (u0 + u1) / 2;
+  const cv = (v0 + v1) / 2;
+  return [cu - (u1 - u0) / (2 * zoom), cv - (v1 - v0) / (2 * zoom), cu + (u1 - u0) / (2 * zoom), cv + (v1 - v0) / (2 * zoom)];
 }
 
-function place(layer: HTMLElement, rect: Rect, radius: number) {
-  layer.style.top = `${rect.top}px`;
-  layer.style.left = `${rect.left}px`;
-  layer.style.width = `${rect.width}px`;
-  layer.style.height = `${rect.height}px`;
-  layer.style.borderRadius = `${radius}px`;
+export function syncPillWindows() {
+  const { width, height } = measureViewport();
+  document.querySelectorAll<HTMLElement>("[data-pill]").forEach((pill) => {
+    const img = pill.querySelector("img");
+    if (!(img instanceof HTMLImageElement)) return;
+    const rect = pill.getBoundingClientRect();
+    img.style.width = `${width}px`;
+    img.style.height = `${height}px`;
+    img.style.left = `${-rect.left}px`;
+    img.style.top = `${-rect.top}px`;
+  });
 }
 
-function lerp(a: number, b: number, t: number) {
-  return a + (b - a) * t;
+function clipFor(rect: { top: number; left: number; width: number; height: number }, view: { width: number; height: number }) {
+  const top = rect.top;
+  const left = rect.left;
+  const right = view.width - (rect.left + rect.width);
+  const bottom = view.height - (rect.top + rect.height);
+  const radius = Math.min(Math.max(rect.width, 0), Math.max(rect.height, 0)) / 2;
+  return `inset(${top}px ${right}px ${bottom}px ${left}px round ${radius}px)`;
 }
 
-function makeLayer(image: HTMLImageElement, rect: Rect) {
+function fullClip() {
+  return "inset(0px 0px 0px 0px round 0px)";
+}
+
+function makeStage(source: HTMLImageElement, view: { width: number; height: number }) {
   const layer = document.createElement("div");
   layer.className = "flip-layer";
   layer.setAttribute("aria-hidden", "true");
+  layer.style.width = `${view.width}px`;
+  layer.style.height = `${view.height}px`;
   const img = document.createElement("img");
-  img.src = image.currentSrc || image.src;
+  img.src = source.currentSrc || source.src;
   img.alt = "";
   layer.appendChild(img);
-  place(layer, rect, rect.height / 2);
   document.body.appendChild(layer);
   return layer;
 }
 
-async function animateLayer(options: {
-  layer: HTMLElement;
-  image: HTMLImageElement;
-  from: Rect;
-  to: Rect;
-  dest?: HTMLElement | null;
-  lockScroll?: boolean;
-  reveal?: boolean;
-}) {
-  const { layer, image, from, reveal } = options;
-  let to = options.to;
+async function playClip(layer: HTMLElement, from: string, to: string, source: HTMLImageElement, view: { width: number; height: number }) {
+  layer.style.clipPath = from;
+  layer.getBoundingClientRect();
+  await frame();
+  await frame();
   const fx: { liquid: Liquid | null; canvas: HTMLCanvasElement | null } = { liquid: null, canvas: null };
+  const crop = coverCrop(view.width, view.height, source.naturalWidth || source.width, source.naturalHeight || source.height, SCALE);
   if (mode() === "full") {
     void import("./liquid")
       .then((mod) => {
@@ -86,7 +117,7 @@ async function animateLayer(options: {
         const canvas = document.createElement("canvas");
         canvas.className = "flip-canvas";
         layer.appendChild(canvas);
-        const liquid = mod.createLiquid(canvas, image);
+        const liquid = mod.createLiquid(canvas, source);
         if (!liquid) {
           canvas.remove();
           return;
@@ -98,40 +129,21 @@ async function animateLayer(options: {
         fx.liquid = null;
       });
   }
-  const duration = 820;
-  const start = performance.now();
-  const naturalW = image.naturalWidth || image.width;
-  const naturalH = image.naturalHeight || image.height;
-  let revealed = false;
+  const anim = layer.animate([{ clipPath: from }, { clipPath: to }], {
+    duration: DURATION,
+    easing: EASING,
+    fill: "forwards",
+  });
   await new Promise<void>((resolve) => {
-    const step = (now: number) => {
-      if (options.lockScroll) {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
+    const step = () => {
+      const time = Number(anim.currentTime || 0);
+      const t = Math.min(1, time / DURATION);
+      if (fx.liquid) fx.liquid.draw(time / 1000, Math.sin(Math.PI * t) * 0.55, crop);
+      if (!layer.isConnected || anim.playState === "finished" || anim.playState === "idle") {
+        resolve();
+        return;
       }
-      if (options.dest?.isConnected) to = options.dest.getBoundingClientRect();
-      const t = Math.min(1, (now - start) / duration);
-      const e = ease(t);
-      const rect = {
-        top: lerp(from.top, to.top, e),
-        left: lerp(from.left, to.left, e),
-        width: lerp(from.width, to.width, e),
-        height: lerp(from.height, to.height, e),
-      };
-      const radius = lerp(Math.min(from.width, from.height) / 2, 0, e);
-      place(layer, rect, radius);
-      if (fx.liquid) {
-        const amount = Math.sin(Math.PI * t) * 0.85;
-        const crop = coverCropSafe(rect.width, rect.height, naturalW, naturalH);
-        fx.liquid.draw((now - start) / 1000, amount, crop);
-      }
-      if (reveal && !revealed && t > 0.62) {
-        revealed = true;
-        document.documentElement.dataset.reveal = "1";
-      }
-      if (t < 1) window.requestAnimationFrame(step);
-      else resolve();
+      window.requestAnimationFrame(step);
     };
     window.requestAnimationFrame(step);
   });
@@ -139,23 +151,11 @@ async function animateLayer(options: {
   fx.canvas?.remove();
 }
 
-function coverCropSafe(boxW: number, boxH: number, imgW: number, imgH: number): [number, number, number, number] {
-  if (boxW <= 0 || boxH <= 0 || imgW <= 0 || imgH <= 0) return [0, 0, 1, 1];
-  const box = boxW / boxH;
-  const img = imgW / imgH;
-  if (box > img) {
-    const visible = img / box;
-    const v0 = (1 - visible) / 2;
-    return [0, v0, 1, 1 - v0];
-  }
-  const visible = box / img;
-  const u0 = (1 - visible) / 2;
-  return [u0, 0, 1 - u0, 1];
-}
-
 function finish() {
   busy = false;
+  document.documentElement.classList.remove("is-zooming");
   delete document.documentElement.dataset.flip;
+  delete document.documentElement.dataset.locked;
   delete document.documentElement.dataset.reveal;
   document.querySelector(".flip-layer")?.remove();
   try {
@@ -163,6 +163,36 @@ function finish() {
   } catch {
     /* ignore */
   }
+}
+
+async function placePill(id: string) {
+  const start = performance.now();
+  while (performance.now() - start < 1200) {
+    const pill = document.querySelector<HTMLElement>(`[data-pill="${id}"]`);
+    if (pill && pill.getBoundingClientRect().width > 0) {
+      pill.scrollIntoView({ block: "center", inline: "center", behavior: "auto" });
+      await frame();
+      await frame();
+      syncPillWindows();
+      await frame();
+      const rect = pill.getBoundingClientRect();
+      if (rect.top < 0 || rect.bottom > window.innerHeight || rect.left < 0 || rect.right > document.documentElement.clientWidth) {
+        window.scrollBy({ left: 0, top: rect.top - (window.innerHeight - rect.height) / 2, behavior: "auto" });
+        await frame();
+        syncPillWindows();
+        await frame();
+      }
+      return pill;
+    }
+    await frame();
+  }
+  return null;
+}
+
+function pinTop() {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 }
 
 export async function openDomain(options: {
@@ -178,15 +208,11 @@ export async function openDomain(options: {
     return;
   }
   const current = mode();
-  if (current === "none") {
-    options.navigate(options.href, { fromPills: true });
-    return;
-  }
-  if (current === "fade" && "startViewTransition" in document) {
-    document.startViewTransition(() => options.navigate(options.href, { fromPills: true }));
-    return;
-  }
-  if (current === "fade") {
+  if (current !== "full") {
+    if (current === "fade" && "startViewTransition" in document) {
+      document.startViewTransition(() => options.navigate(options.href, { fromPills: true }));
+      return;
+    }
     options.navigate(options.href, { fromPills: true });
     return;
   }
@@ -196,31 +222,58 @@ export async function openDomain(options: {
   } catch {
     /* ignore */
   }
-  const from = options.source.getBoundingClientRect();
-  const layer = makeLayer(image, from);
-  options.source.closest(".pill-row")?.classList.add("is-dimmed");
-  document.documentElement.dataset.flip = "open";
-  options.navigate(options.href, { fromPills: true });
-  window.scrollTo(0, 0);
+  syncPillWindows();
   await frame();
-  window.scrollTo(0, 0);
-  const dest = await waitFor(`[data-domain-hero="${options.id}"]`);
-  if (!dest) {
-    layer.remove();
-    finish();
-    return;
-  }
-  window.scrollTo(0, 0);
+  const view = measureViewport();
+  const fromRect = options.source.getBoundingClientRect();
+  const layer = makeStage(image, view);
+  const from = clipFor(fromRect, view);
   try {
-    await animateLayer({
-      layer,
-      image,
-      from,
-      to: dest.getBoundingClientRect(),
-      dest,
-      lockScroll: true,
-      reveal: true,
-    });
+    document.documentElement.classList.add("is-zooming");
+    await playClip(layer, from, fullClip(), image, view);
+    pinTop();
+    document.documentElement.dataset.flip = "open";
+    options.navigate(options.href, { fromPills: true });
+    for (let i = 0; i < 12; i += 1) {
+      pinTop();
+      await frame();
+      if (window.scrollY <= 1) break;
+    }
+    pinTop();
+    document.documentElement.dataset.locked = "1";
+    await frame();
+    layer.remove();
+    await frame();
+    document.documentElement.dataset.reveal = "1";
+    const timer = window.setInterval(pinTop, 50);
+    await wait(620);
+    window.clearInterval(timer);
+    pinTop();
+  } finally {
+    finish();
+  }
+}
+
+async function shrinkToPill(id: string, image: HTMLImageElement, go: () => void) {
+  busy = true;
+  try {
+    history.scrollRestoration = "manual";
+  } catch {
+    /* ignore */
+  }
+  pinTop();
+  const view = measureViewport();
+  const layer = makeStage(image, view);
+  layer.style.clipPath = fullClip();
+  document.documentElement.dataset.flip = "close";
+  go();
+  try {
+    const pill = await placePill(id);
+    if (!pill) return;
+    const viewNow = measureViewport();
+    layer.style.width = `${viewNow.width}px`;
+    layer.style.height = `${viewNow.height}px`;
+    await playClip(layer, fullClip(), clipFor(pill.getBoundingClientRect(), viewNow), image, viewNow);
   } finally {
     layer.remove();
     finish();
@@ -232,49 +285,20 @@ export async function closeDomain(navigate: (href: string) => void) {
   const hero = document.querySelector<HTMLElement>("[data-domain-hero]");
   const image = hero?.querySelector("img");
   const id = hero?.dataset.domainHero;
-  if (!hero || !(image instanceof HTMLImageElement) || !id) {
-    navigate(sitePath("/#accompagnements"));
-    return;
-  }
-  const current = mode();
   const go = () => {
     const state = history.state as { fromPills?: boolean } | null;
     if (state?.fromPills) history.back();
     else navigate(sitePath("/#accompagnements"));
   };
-  if (current === "none") {
+  if (!hero || !(image instanceof HTMLImageElement) || !id || mode() !== "full") {
+    if (mode() === "fade" && "startViewTransition" in document) {
+      document.startViewTransition(go);
+      return;
+    }
     go();
     return;
   }
-  if (current === "fade" && "startViewTransition" in document) {
-    document.startViewTransition(go);
-    return;
-  }
-  if (current === "fade") {
-    go();
-    return;
-  }
-  busy = true;
-  const from = hero.getBoundingClientRect();
-  const layer = makeLayer(image, from);
-  document.documentElement.dataset.flip = "close";
-  go();
-  await frame();
-  await frame();
-  const pill = await waitFor(`[data-pill="${id}"]`);
-  if (!pill) {
-    layer.remove();
-    finish();
-    return;
-  }
-  pill.scrollIntoView({ block: "center", behavior: "auto" });
-  await frame();
-  try {
-    await animateLayer({ layer, image, from, to: pill.getBoundingClientRect() });
-  } finally {
-    layer.remove();
-    finish();
-  }
+  await shrinkToPill(id, image, go);
 }
 
 export function returnFromPop(commit: () => void) {
@@ -285,8 +309,7 @@ export function returnFromPop(commit: () => void) {
   const hero = document.querySelector<HTMLElement>("[data-domain-hero]");
   const image = hero?.querySelector("img");
   const id = hero?.dataset.domainHero;
-  const nextIsHome = true;
-  if (!hero || !(image instanceof HTMLImageElement) || !id || !nextIsHome || mode() !== "full") {
+  if (!hero || !(image instanceof HTMLImageElement) || !id || mode() !== "full") {
     if (mode() === "fade" && "startViewTransition" in document && hero) {
       document.startViewTransition(commit);
       return;
@@ -294,27 +317,5 @@ export function returnFromPop(commit: () => void) {
     commit();
     return;
   }
-  busy = true;
-  const from = hero.getBoundingClientRect();
-  const layer = makeLayer(image, from);
-  document.documentElement.dataset.flip = "close";
-  commit();
-  void (async () => {
-    await frame();
-    await frame();
-    const pill = await waitFor(`[data-pill="${id}"]`);
-    if (!pill) {
-      layer.remove();
-      finish();
-      return;
-    }
-    pill.scrollIntoView({ block: "center", behavior: "auto" });
-    await wait(16);
-    try {
-      await animateLayer({ layer, image, from, to: pill.getBoundingClientRect() });
-    } finally {
-      layer.remove();
-      finish();
-    }
-  })();
+  void shrinkToPill(id, image, commit);
 }

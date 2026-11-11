@@ -7,7 +7,7 @@ const VERT = `
 attribute vec2 aPos;
 varying vec2 vUv;
 void main() {
-  vUv = vec2(aPos.x * 0.5 + 0.5, 0.5 - aPos.y * 0.5);
+  vUv = vec2(aPos.x * 0.5 + 0.5, aPos.y * 0.5 + 0.5);
   gl_Position = vec4(aPos, 0.0, 1.0);
 }
 `;
@@ -43,8 +43,11 @@ function compile(gl: WebGLRenderingContext, type: number, source: string) {
 
 export function createLiquid(canvas: HTMLCanvasElement, image: HTMLImageElement): Liquid | null {
   const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  canvas.width = Math.max(2, Math.round(Math.min(window.innerWidth, 1280) * dpr));
-  canvas.height = Math.max(2, Math.round(Math.min(window.innerHeight, 900) * dpr));
+  const parent = canvas.parentElement;
+  const boxW = parent?.clientWidth || window.innerWidth;
+  const boxH = parent?.clientHeight || window.innerHeight;
+  canvas.width = Math.max(2, Math.round(boxW * dpr));
+  canvas.height = Math.max(2, Math.round(boxH * dpr));
   const gl = canvas.getContext("webgl", { premultipliedAlpha: false, alpha: true, antialias: false });
   if (!gl) return null;
   const vs = compile(gl, gl.VERTEX_SHADER, VERT);

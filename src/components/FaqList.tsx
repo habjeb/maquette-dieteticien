@@ -1,6 +1,17 @@
 import { useId, useState } from "react";
+import { sitePath } from "../lib/paths";
+import { A } from "../router";
 
-export function FaqList({ items }: { items: readonly { id: string; q: string; a: string }[] }) {
+export function FaqList({
+  items,
+}: {
+  items: readonly {
+    id: string;
+    q: string;
+    a: string;
+    links?: readonly { href: string; label: string }[];
+  }[];
+}) {
   const [open, setOpen] = useState<string | null>(null);
   const baseId = useId();
   return (
@@ -27,7 +38,20 @@ export function FaqList({ items }: { items: readonly { id: string; q: string; a:
             </h3>
             <div className="faq-panel" id={panelId} role="region" aria-labelledby={buttonId} inert={expanded ? undefined : true}>
               <div className="faq-panel-inner">
-                <p>{item.a}</p>
+                <p>
+                  {item.a}
+                  {item.links?.length ? (
+                    <>
+                      {" "}
+                      {item.links.map((link, index) => (
+                        <span key={link.href}>
+                          {index > 0 ? " · " : ""}
+                          <A href={sitePath(link.href)}>{link.label}</A>
+                        </span>
+                      ))}
+                    </>
+                  ) : null}
+                </p>
               </div>
             </div>
           </article>
