@@ -73,9 +73,17 @@ function coverCrop(boxW: number, boxH: number, imgW: number, imgH: number, scale
 
 export function syncPillWindows() {
   const { width, height } = measureViewport();
+  const narrow = window.matchMedia("(max-width: 899px)").matches;
   document.querySelectorAll<HTMLElement>("[data-pill]").forEach((pill) => {
     const img = pill.querySelector("img");
     if (!(img instanceof HTMLImageElement)) return;
+    if (narrow) {
+      img.style.width = "";
+      img.style.height = "";
+      img.style.left = "";
+      img.style.top = "";
+      return;
+    }
     const rect = pill.getBoundingClientRect();
     img.style.width = `${width}px`;
     img.style.height = `${height}px`;

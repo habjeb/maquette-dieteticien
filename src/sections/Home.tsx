@@ -114,19 +114,44 @@ function Sectors() {
     const update = () => syncPillWindows();
     update();
     const row = scroller.current;
+    const onRowScroll = () => {
+      update();
+      if (!row || window.innerWidth >= 900) return;
+      const cards = [...row.querySelectorAll<HTMLElement>(".sector-card")];
+      const center = row.scrollLeft + row.clientWidth / 2;
+      let best = 0;
+      let bestDist = Number.POSITIVE_INFINITY;
+      cards.forEach((card, index) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+        const dist = Math.abs(cardCenter - center);
+        if (dist < bestDist) {
+          best = index;
+          bestDist = dist;
+        }
+      });
+      setActive((current) => (current === best ? current : best));
+    };
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, { passive: true });
-    row?.addEventListener("scroll", update, { passive: true });
+    row?.addEventListener("scroll", onRowScroll, { passive: true });
     return () => {
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update);
-      row?.removeEventListener("scroll", update);
+      row?.removeEventListener("scroll", onRowScroll);
     };
   }, []);
 
+  function showCard(index: number) {
+    const row = scroller.current;
+    const card = row?.querySelectorAll<HTMLElement>(".sector-card")[index];
+    if (!row || !card) return;
+    setActive(index);
+    row.scrollTo({ left: card.offsetLeft - (row.clientWidth - card.offsetWidth) / 2, behavior: "smooth" });
+  }
+
   return (
     <section className="sector-stage" id="accompagnements" aria-labelledby="secteurs-titre">
-      <h2 id="secteurs-titre" className="sr-only">
+      <h2 id="secteurs-titre" className="sector-title">
         Domaines d’accompagnement
       </h2>
       <div className="sector-bgs" aria-hidden="true">
@@ -189,6 +214,24 @@ function Sectors() {
             </article>
           );
         })}
+      </div>
+      <div className="sector-pager">
+        <p className="sector-count" aria-live="polite">
+          {active + 1} / {domains.length}
+        </p>
+        <div className="sector-dots">
+          {domains.map((domain, index) => (
+            <button
+              key={domain.id}
+              type="button"
+              className={index === active ? "is-on" : ""}
+              aria-label={domain.title}
+              aria-current={index === active ? "true" : undefined}
+              onClick={() => showCard(index)}
+            />
+          ))}
+        </div>
+        <p className="sector-hint">Glisser</p>
       </div>
     </section>
   );
