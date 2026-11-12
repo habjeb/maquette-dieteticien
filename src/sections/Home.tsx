@@ -210,28 +210,30 @@ function About() {
             </A>
           </div>
         </Reveal>
-        <Reveal className="home-split-row">
-          <h3>
-            <span aria-hidden="true">• </span>À propos
-          </h3>
-          <div>
+        <Reveal className="home-split-row home-about">
+          <div className="about-identity">
+            <h3>
+              <span aria-hidden="true">• </span>À propos
+            </h3>
             <figure className="portrait">
               <Photo {...photos.portrait} />
             </figure>
-            <dl className="facts">
-              <div>
-                <dt>Diplôme</dt>
-                <dd>{site.diploma}</dd>
-              </div>
-              <div>
-                <dt>Expérience</dt>
-                <dd>
-                  {site.experiences}
-                  <br />
-                  {site.sportBackground}
-                </dd>
-              </div>
-            </dl>
+          </div>
+          <dl className="facts">
+            <div>
+              <dt>Diplôme</dt>
+              <dd>{site.diploma}</dd>
+            </div>
+            <div>
+              <dt>Expérience</dt>
+              <dd>
+                {site.experiences}
+                <br />
+                {site.sportBackground}
+              </dd>
+            </div>
+          </dl>
+          <div className="about-copy">
             <p>
               Pour moi, un conseil alimentaire doit avoir sa place dans votre quotidien. En consultation, je prends
               d’abord le temps de comprendre ce qui vous amène, ce qui vous convient déjà et ce que vous aimeriez faire
@@ -244,7 +246,7 @@ function About() {
             </p>
           </div>
         </Reveal>
-        <Reveal className="home-split-row" >
+        <Reveal className="home-split-row home-approach">
           <h3 id="methode">
             <span aria-hidden="true">• </span>Approche
           </h3>
