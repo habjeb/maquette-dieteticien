@@ -36,7 +36,7 @@ export const site = {
   durationInitial: "60 minutes",
   durationFollowUp: "30 à 45 minutes",
   googleBusinessUrl: "",
-  /** Lien vers la fiche d’avis Google. Vide tant que l’URL réelle n’est pas fournie. */
+  /** TODO: URL de la fiche Google quand elle existera. La section Avis n’est pas affichée tant que ce lien et les avis ne sont pas prêts. */
   googleReviewsUrl: "",
 
   mediatorName: "[Nom du médiateur de la consommation à compléter]",
@@ -74,7 +74,8 @@ export type Review = {
   date: string;
 };
 
-// TODO: renseigner les avis réels (auteur, note, texte, date). Ne pas inventer d’avis.
+// TODO: la section Avis viendra plus tard, quand la fiche Google existera.
+// Ne pas inventer d’avis. Laisser ce tableau vide : rien ne l’affiche pour l’instant.
 export const reviews: readonly Review[] = [];
 
 export function isRealPhone(value: string) {

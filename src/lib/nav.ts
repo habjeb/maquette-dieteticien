@@ -26,7 +26,6 @@ export const NAV: readonly NavItem[] = [
   },
   { id: "consultations", href: `${home}#consultations`, label: "Consultations" },
   { id: "a-propos", href: `${home}#a-propos`, label: "À propos" },
-  { id: "avis", href: `${home}#avis`, label: "Avis" },
   { id: "faq", href: `${home}#faq`, label: "FAQ" },
   { id: "rendez-vous", href: `${home}#rendez-vous`, label: "Rendez-vous" },
   { id: "reperes", href: `${home}#reperes`, label: "Repères" },

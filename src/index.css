@@ -1030,32 +1030,6 @@ html.is-zooming:not([data-flip]) .book-bar {
 .about-card img { width: 132px; height: 132px; background: var(--white); }
 .home-approach { margin-top: 2.25rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
 .home-approach > h3 { margin-bottom: 1rem; }
-.review-pending { max-width: 38rem; margin: 0 0 0.8rem; }
-.review-more { margin: 1rem 0 0; }
-.review-marquee { overflow: hidden; }
-.review-track { display: flex; width: max-content; animation: review-marquee 42s linear infinite; }
-.review-marquee:hover .review-track,
-.review-marquee:focus-within .review-track,
-.review-marquee.is-held .review-track { animation-play-state: paused; }
-.review-row { display: flex; gap: 0.9rem; margin: 0; padding: 0 0.45rem 0 0; list-style: none; }
-.review-card {
-  width: min(22rem, 78vw);
-  padding: 1.1rem 1.15rem 0.9rem;
-  border-radius: 1.1rem;
-  background: var(--ivory);
-}
-.review-stars { margin: 0 0 0.45rem; letter-spacing: 0.12em; color: var(--forest); }
-.review-card p { margin: 0 0 0.7rem; }
-.review-meta { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.92rem; }
-@keyframes review-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .review-track { animation: none; flex-wrap: wrap; width: auto; }
-  .review-row[aria-hidden="true"] { display: none; }
-  .review-row { flex-wrap: wrap; }
-}
 .about-layout .portrait { margin: 0; }
 .about-layout .portrait img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 1.2rem; }
 .sector-kicker { position: relative; z-index: 1; }

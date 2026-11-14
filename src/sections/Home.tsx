@@ -6,7 +6,7 @@ import { domains, faq, heroText, heroTitle, photos, steps } from "../content/edi
 import { openDomain, syncPillWindows } from "../fx/domainFlip";
 import { heroTitleFont } from "../lib/heroFont";
 import { publicAsset, sitePath } from "../lib/paths";
-import { offers, reviews, site, tariffSentence, type Review } from "../lib/site";
+import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
 
 export function HomePage() {
@@ -22,7 +22,6 @@ export function HomePage() {
       <Sectors />
       <Consultations />
       <About />
-      <Reviews />
       <Faq />
       <CallBand />
       <Markers />
@@ -384,7 +383,7 @@ function CallBand() {
       <div className="container home-call-grid">
         <Reveal>
           <p className="section-kicker section-kicker-light">
-            <span>06</span> Rendez-vous
+            <span>05</span> Rendez-vous
           </p>
           <h2 data-reveal="title">Prendre rendez-vous</h2>
           <p data-reveal="lines">
@@ -412,7 +411,7 @@ function Markers() {
       <div className="container">
         <header className="section-head">
           <p className="section-kicker">
-            <span>07</span> Repères
+            <span>06</span> Repères
           </p>
           <h2 id="reperes-titre" data-reveal="title">
             Repères pratiques
@@ -445,83 +444,13 @@ function Markers() {
   );
 }
 
-function Reviews() {
-  return (
-    <section className="home-section home-section-sage" id="avis" aria-labelledby="avis-titre">
-      <div className="container">
-        <header className="section-head">
-          <p className="section-kicker">
-            <span>04</span> Avis
-          </p>
-          <h2 id="avis-titre" data-reveal="title">
-            Avis
-          </h2>
-        </header>
-        {reviews.length === 0 ? (
-          <p className="review-pending">
-            Provisoire. Les avis ne sont pas encore renseignés : aucun avis n’est affiché tant que la liste n’est pas
-            complétée.
-          </p>
-        ) : (
-          <ReviewMarquee items={reviews} />
-        )}
-        {site.googleReviewsUrl ? (
-          <p className="review-more">
-            <a href={site.googleReviewsUrl} target="_blank" rel="noopener noreferrer">
-              Voir la fiche Google
-            </a>
-          </p>
-        ) : (
-          <p className="review-pending">Le lien vers la fiche Google sera ajouté.</p>
-        )}
-      </div>
-    </section>
-  );
-}
-
-function ReviewMarquee({ items }: { items: readonly Review[] }) {
-  const [held, setHeld] = useState(false);
-  const cards = (copy: boolean) =>
-    items.map((review) => (
-      <li key={`${copy ? "b" : "a"}-${review.author}-${review.date}`}>
-        <article className="review-card">
-          <p className="review-stars" aria-label={`${review.rating} sur 5`}>
-            {"★".repeat(review.rating)}
-            <span className="sr-only"> sur 5</span>
-          </p>
-          <p>{review.text}</p>
-          <p className="review-meta">
-            <span>{review.author}</span>
-            <time dateTime={review.date}>{review.date}</time>
-          </p>
-        </article>
-      </li>
-    ));
-  return (
-    <div
-      className={`review-marquee${held ? " is-held" : ""}`}
-      onPointerDown={() => setHeld(true)}
-      onPointerUp={() => setHeld(false)}
-      onPointerCancel={() => setHeld(false)}
-      onPointerLeave={() => setHeld(false)}
-    >
-      <div className="review-track">
-        <ul className="review-row">{cards(false)}</ul>
-        <ul className="review-row" aria-hidden="true">
-          {cards(true)}
-        </ul>
-      </div>
-    </div>
-  );
-}
-
 function Faq() {
   return (
     <section className="home-section home-faq" id="faq">
       <div className="container faq-layout">
         <Reveal>
           <p className="section-kicker">
-            <span>05</span> FAQ
+            <span>04</span> FAQ
           </p>
           <h2 data-reveal="title">Questions fréquentes</h2>
           <p data-reveal="lines">
