@@ -4,21 +4,10 @@ import { FaqList } from "../components/FaqList";
 import { BookLink, Photo } from "../components/ui";
 import { domains, faq, heroText, heroTitle, photos, steps } from "../content/editorial";
 import { openDomain, syncPillWindows } from "../fx/domainFlip";
+import { heroTitleFont } from "../lib/heroFont";
 import { publicAsset, sitePath } from "../lib/paths";
 import { offers, site, tariffSentence } from "../lib/site";
 import { A, useRoute } from "../router";
-
-const markers = [
-  "Visioconférence partout en France",
-  `Déplacement dans le secteur de ${site.area}`,
-  site.communes.join(", "),
-  site.experiences,
-  site.sportBackground,
-  `Bilan initial : ${site.durationInitial}`,
-  `Consultation de suivi : ${site.durationFollowUp}`,
-  `Annulation : ${site.cancelDelay}`,
-  `Règlement : ${site.paymentMethods}`,
-] as const;
 
 export function HomePage() {
   useLayoutEffect(() => {
@@ -31,12 +20,11 @@ export function HomePage() {
     <div className="home">
       <Hero />
       <Sectors />
-      <Statement />
-      <About />
       <Consultations />
+      <About />
+      <Faq />
       <CallBand />
       <Markers />
-      <Faq />
     </div>
   );
 }
@@ -110,8 +98,8 @@ function Hero() {
     <section className="home-hero" id="accueil" ref={sectionRef}>
       {wash ? <canvas ref={canvasRef} className="home-hero-wash" aria-hidden="true" /> : null}
       <div className="container home-hero-grid">
-        <Reveal>
-          <h1 data-reveal="title" data-reveal-after="intro">
+        <Reveal className="home-hero-copy">
+          <h1 className={`home-hero-title is-${heroTitleFont}`} data-reveal="title" data-reveal-after="intro">
             {heroTitle}
           </h1>
           <p className="lede home-hero-lede" data-reveal="lines" data-reveal-after="intro">
@@ -126,27 +114,11 @@ function Hero() {
   );
 }
 
-function Statement() {
-  return (
-    <section className="home-statement">
-      <div className="container">
-        <Reveal>
-          <p data-reveal="lines">
-            Du premier bilan aux rendez-vous de suivi, nous définissons ensemble les étapes qui vous conviennent.
-          </p>
-          <A className="btn btn-primary" href={`${sitePath("/")}#accompagnements`}>
-            Découvrir les accompagnements
-          </A>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 function Sectors() {
   const { navigate } = useRoute();
   const [active, setActive] = useState(0);
   const scroller = useRef<HTMLDivElement>(null);
+  const drag = useRef({ x: 0, y: 0, moved: false });
 
   useLayoutEffect(() => {
     const update = () => syncPillWindows();
@@ -189,6 +161,9 @@ function Sectors() {
 
   return (
     <section className="sector-stage" id="accompagnements" aria-labelledby="secteurs-titre">
+      <p className="section-kicker sector-kicker">
+        <span>01</span> Accompagnements
+      </p>
       <h2 id="secteurs-titre" className="sector-title">
         Domaines d’accompagnement
       </h2>
@@ -205,51 +180,61 @@ function Sectors() {
       <div
         className="sector-cards"
         ref={scroller}
+        onPointerDown={(event) => {
+          drag.current = { x: event.clientX, y: event.clientY, moved: false };
+        }}
+        onPointerMove={(event) => {
+          if (event.buttons === 0) return;
+          if (Math.hypot(event.clientX - drag.current.x, event.clientY - drag.current.y) > 12) {
+            drag.current.moved = true;
+          }
+        }}
         onKeyDown={(event) => {
           if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
           event.preventDefault();
           const next = event.key === "ArrowRight" ? (active + 1) % domains.length : (active + domains.length - 1) % domains.length;
           setActive(next);
           const card = scroller.current?.querySelectorAll<HTMLElement>(".sector-card")[next];
-          card?.querySelector<HTMLElement>("a")?.focus();
+          card?.focus();
         }}
       >
         {domains.map((domain, index) => {
           const href = sitePath(domain.path);
           const opened = index === active;
           return (
-            <article
+            <A
               className={`sector-card${opened ? " is-active" : ""}`}
               key={domain.id}
+              href={href}
               data-pill={domain.id}
+              aria-label={`Découvrir ${domain.title}`}
               onMouseEnter={() => setActive(index)}
               onFocus={() => setActive(index)}
+              onClick={(event) => {
+                if (drag.current.moved) {
+                  event.preventDefault();
+                  return;
+                }
+                const card = event.currentTarget;
+                event.preventDefault();
+                void openDomain({ id: domain.id, source: card, href, navigate });
+              }}
             >
               <div className="sector-body">
                 <h3>{domain.title}</h3>
                 <p>{domain.summary}</p>
                 <span className="sector-rule" aria-hidden="true" />
-                <A
-                  className="sector-link"
-                  href={href}
-                  aria-label={`Découvrir ${domain.title}`}
-                  onClick={(event) => {
-                    const card = event.currentTarget.closest(".sector-card");
-                    if (!(card instanceof HTMLElement)) return;
-                    event.preventDefault();
-                    void openDomain({ id: domain.id, source: card, href, navigate });
-                  }}
-                >
+                <span className="sector-link">
                   <span>Découvrir</span>
                   <span className="sector-arrow" aria-hidden="true">
                     →
                   </span>
-                </A>
+                </span>
               </div>
               <span className="pill-media sector-zoom">
                 <Photo {...domain.photo} />
               </span>
-            </article>
+            </A>
           );
         })}
       </div>
@@ -277,60 +262,55 @@ function Sectors() {
 
 function About() {
   return (
-    <section className="home-split" id="a-propos">
+    <section className="home-section" id="a-propos">
       <div className="container">
-        <Reveal className="home-split-head">
-          <h2 data-reveal="title">Un conseil alimentaire doit avoir sa place dans votre quotidien.</h2>
-          <div>
-            <p data-reveal="lines">
+        <header className="section-head">
+          <p className="section-kicker">
+            <span>03</span> À propos
+          </p>
+          <h2 data-reveal="title">À propos et méthode</h2>
+        </header>
+        <div className="about-layout">
+          <figure className="portrait">
+            <Photo {...photos.portrait} />
+          </figure>
+          <div className="about-main">
+            <p>
               Je suis diététicien-nutritionniste, en exercice libéral. Je reçois en visioconférence et je me déplace à
               domicile dans la région sud lyonnaise.
             </p>
+            <p>
+              En consultation, je prends d’abord le temps de comprendre ce qui vous amène, ce qui vous convient déjà et
+              ce que vous aimeriez faire évoluer. Je m’appuie sur les recommandations scientifiques pour vous expliquer
+              les options qui s’offrent à vous, en tenant compte de vos goûts, de votre rythme de vie, de votre budget
+              et, si nécessaire, de votre suivi médical. Ensemble, nous choisissons les premiers changements à essayer,
+              à votre rythme.
+            </p>
+            <dl className="facts">
+              <div>
+                <dt>Diplôme</dt>
+                <dd>{site.diploma}</dd>
+              </div>
+              <div>
+                <dt>Expérience</dt>
+                <dd>
+                  {site.experiences}
+                  <br />
+                  {site.sportBackground}
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <aside className="about-card">
+            <p className="section-kicker">Carte de visite</p>
+            <img src={publicAsset("carte-qr.svg")} width="148" height="148" alt="QR code vers la carte de visite digitale de Nicolas Boyer" />
             <A className="btn btn-primary" href={sitePath("/carte")}>
-              Carte de visite
+              Ouvrir la carte
             </A>
-          </div>
-        </Reveal>
-        <Reveal className="home-split-row home-about">
-          <div className="about-identity">
-            <h3>
-              <span aria-hidden="true">• </span>À propos
-            </h3>
-            <figure className="portrait">
-              <Photo {...photos.portrait} />
-            </figure>
-          </div>
-          <dl className="facts">
-            <div>
-              <dt>Diplôme</dt>
-              <dd>{site.diploma}</dd>
-            </div>
-            <div>
-              <dt>Expérience</dt>
-              <dd>
-                {site.experiences}
-                <br />
-                {site.sportBackground}
-              </dd>
-            </div>
-          </dl>
-          <div className="about-copy">
-            <p>
-              Pour moi, un conseil alimentaire doit avoir sa place dans votre quotidien. En consultation, je prends
-              d’abord le temps de comprendre ce qui vous amène, ce qui vous convient déjà et ce que vous aimeriez faire
-              évoluer.
-            </p>
-            <p>
-              Je m’appuie sur les recommandations scientifiques pour vous expliquer les options qui s’offrent à vous, en
-              tenant compte de vos goûts, de votre rythme de vie, de votre budget et, si nécessaire, de votre suivi
-              médical. Ensemble, nous choisissons les premiers changements à essayer, à votre rythme.
-            </p>
-          </div>
-        </Reveal>
-        <Reveal className="home-split-row home-approach">
-          <h3 id="methode">
-            <span aria-hidden="true">• </span>Approche
-          </h3>
+          </aside>
+        </div>
+        <div className="home-approach">
+          <h3 id="methode">Méthode</h3>
           <ol className="steps">
             {steps.map((step, index) => (
               <li key={step.title}>
@@ -340,7 +320,7 @@ function About() {
               </li>
             ))}
           </ol>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -362,17 +342,23 @@ function Consultations() {
     },
   ];
   return (
-    <section className="home-offers" id="consultations">
+    <section className="home-section home-section-sage home-offers" id="consultations">
       <div className="container">
-        <Reveal className="home-offers-head">
+        <header className="section-head">
+          <p className="section-kicker">
+            <span>02</span> Consultations
+          </p>
           <h2 data-reveal="title">Modalités de consultation</h2>
-          <p data-reveal="lines">{tariffSentence}</p>
-        </Reveal>
+          <p className="lede" data-reveal="lines">
+            {tariffSentence}
+          </p>
+        </header>
         <div className="home-offers-grid" data-booking-visible>
           {groups.map((group) => (
             <Reveal key={group.id}>
               <article className="home-offer" id={group.id}>
                 <h3>{group.name}</h3>
+                <p className="home-offer-price">{group.id === "bilan" ? site.priceInitial : site.priceFollowUp}</p>
                 <p className="home-offer-duration">{group.duration}</p>
                 <p>En visioconférence partout en France, ou en déplacement dans le secteur de {site.area}.</p>
                 <div className="consult-actions">
@@ -396,10 +382,16 @@ function CallBand() {
     <section className="home-call" id="rendez-vous" data-booking-visible>
       <div className="container home-call-grid">
         <Reveal>
-          <p className="home-call-kicker">Rendez-vous</p>
+          <p className="section-kicker section-kicker-light">
+            <span>05</span> Rendez-vous
+          </p>
           <h2 data-reveal="title">Prendre rendez-vous</h2>
           <p data-reveal="lines">
             {site.practiceLine} {tariffSentence} {site.privacyNote}
+          </p>
+          <p className="home-contact">
+            <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
           <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-light">
             Prendre rendez-vous
@@ -415,21 +407,37 @@ function CallBand() {
 
 function Markers() {
   return (
-    <section className="home-markers" aria-labelledby="reperes-titre">
+    <section className="home-section home-markers" id="reperes" aria-labelledby="reperes-titre">
       <div className="container">
-        <Reveal className="home-split-head">
-          <h2 id="reperes-titre" data-reveal="title">
-            Repères de la pratique
-          </h2>
-          <p data-reveal="lines">
-            Uniquement ce qui est déjà indiqué sur le site. Les diplômes, numéros et logos encore entre crochets ne
-            sont pas présentés ici comme des certifications.
+        <header className="section-head">
+          <p className="section-kicker">
+            <span>06</span> Repères
           </p>
-        </Reveal>
+          <h2 id="reperes-titre" data-reveal="title">
+            Repères pratiques
+          </h2>
+        </header>
         <ul className="home-marker-grid">
-          {markers.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
+          <li>
+            <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
+          </li>
+          <li>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </li>
+          <li>Diplôme : {site.diploma}</li>
+          <li>Visioconférence partout en France</li>
+          <li>Déplacement dans le secteur de {site.area}</li>
+          <li>{site.communes.join(", ")}</li>
+          <li>{site.experiences}</li>
+          <li>{site.sportBackground}</li>
+          <li>
+            Bilan initial : {site.durationInitial}, {site.priceInitial}
+          </li>
+          <li>
+            Consultation de suivi : {site.durationFollowUp}, {site.priceFollowUp}
+          </li>
+          <li>Annulation : {site.cancelDelay}</li>
+          <li>Règlement : {site.paymentMethods}</li>
         </ul>
       </div>
     </section>
@@ -438,9 +446,12 @@ function Markers() {
 
 function Faq() {
   return (
-    <section className="home-faq" id="faq">
+    <section className="home-section home-faq" id="faq">
       <div className="container faq-layout">
         <Reveal>
+          <p className="section-kicker">
+            <span>04</span> FAQ
+          </p>
           <h2 data-reveal="title">Questions fréquentes</h2>
           <p data-reveal="lines">
             Les réponses restent générales. Le détail d’une situation se voit en consultation, pas dans un formulaire.

@@ -52,9 +52,9 @@ const pages = {
           <br />
           Adresse professionnelle : {site.address}
           <br />
-          Téléphone : {site.phoneDisplay}
+          Téléphone : <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
           <br />
-          E-mail : {site.email}
+          E-mail : <a href={`mailto:${site.email}`}>{site.email}</a>
           <br />
           SIREN : {site.siren}
           <br />
@@ -108,7 +108,7 @@ const pages = {
       <>
         <h2>Responsable</h2>
         <p>
-          {site.legalName}, {site.jobTitle}. Contact : {site.email}. Adresse : {site.address}.
+          {site.legalName}, {site.jobTitle}. Contact : <a href={`mailto:${site.email}`}>{site.email}</a>. Adresse : {site.address}.
         </p>
         <h2>Ce que le site collecte</h2>
         <p>
@@ -160,8 +160,8 @@ const pages = {
         </p>
         <h2>Tarif</h2>
         <p>
-          Le tarif est communiqué et accepté avant la prestation, lors de la prise de rendez-vous. Aucune grille
-          tarifaire n’est publiée sur ce site. TVA : {site.vat}.
+          Consultation initiale : {site.priceInitial}. Consultation de suivi : {site.priceFollowUp}. Le montant est
+          indiqué avant la prestation. TVA : {site.vat}.
         </p>
         <h2>Réservation</h2>
         <p>
@@ -175,7 +175,8 @@ const pages = {
         </p>
         <h2>Paiement</h2>
         <p>
-          Moyens acceptés : {site.paymentMethods}. Le règlement ne se fait pas en ligne. Aucun montant n’est publié ici.
+          Moyens acceptés : {site.paymentMethods}. Le règlement ne se fait pas en ligne. Les deux montants indiqués
+          ci-dessus sont ceux des consultations.
         </p>
         <h2>Droit de rétractation</h2>
         <p>
@@ -214,7 +215,8 @@ const pages = {
           )}
         </p>
         <p>
-          Il est demandé de contacter d’abord {site.fullName} ({site.email}) et de laisser le temps d’une réponse,
+          Il est demandé de contacter d’abord {site.fullName} (
+          <a href={`mailto:${site.email}`}>{site.email}</a>) et de laisser le temps d’une réponse,
           avant de saisir le médiateur.
         </p>
         <p>

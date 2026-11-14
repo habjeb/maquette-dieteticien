@@ -113,6 +113,10 @@ export function Header() {
           </button>
         </div>
       </div>
+      <p className="header-contact">
+        <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
+        <a href={`mailto:${site.email}`}>{site.email}</a>
+      </p>
 
       <div
         className={`menu-sheet${open ? " is-open" : ""}`}
@@ -173,6 +177,10 @@ export function Header() {
           ))}
         </nav>
         <div className="menu-foot">
+          <p className="home-contact">
+            <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
           <BookLink href={site.booking.general} label="Prendre rendez-vous" className="btn btn-primary btn-block">
             Prendre rendez-vous
           </BookLink>

@@ -40,6 +40,8 @@ function dietitian() {
       ...site.communes.map((name) => ({ "@type": "City", name })),
       { "@type": "Country", name: "France" },
     ],
+    telephone: site.phoneTel,
+    email: site.email,
     availableLanguage: "fr",
     knowsAbout: ["Diététique", "Nutrition", "Nutrition sportive"],
   };

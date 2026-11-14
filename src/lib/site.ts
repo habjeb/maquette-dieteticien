@@ -1,9 +1,8 @@
 /**
  * Identité, coordonnées et données factuelles.
- * Remplacez les valeurs entre crochets et les URL Calendly.
- * Aucun tarif n’est publié : le montant est communiqué avant la consultation, lors de la prise de rendez-vous.
- * Ne pas y inscrire de donnée inventée : tant qu’une valeur est un placeholder,
- * elle n’est pas publiée dans les données structurées (téléphone, e-mail, adresse).
+ * Le téléphone, l’e-mail, le diplôme et les deux tarifs de consultation sont ceux
+ * indiqués par Nicolas Boyer. L’adresse et les numéros encore entre crochets restent à compléter.
+ * Ne jamais employer le mot « devis ».
  */
 export const site = {
   firstName: "Nicolas",
@@ -15,15 +14,17 @@ export const site = {
   practiceLine:
     "Exercice libéral. Consultations en visioconférence partout en France et en déplacement dans le secteur de Condrieu.",
 
-  phoneDisplay: "[Téléphone à compléter]",
-  phoneTel: "",
-  email: "[E-mail à compléter]",
+  phoneDisplay: "06 70 40 80 42",
+  phoneTel: "+33670408042",
+  email: "boyer.nicolas.pr8@gmail.com",
   address: "[Adresse professionnelle à compléter]",
   siren: "[SIREN]",
   registration: "[Immatriculation à compléter]",
   rpps: "[RPPS]",
   professionalRecord: "[Enregistrement professionnel à compléter]",
-  diploma: "[Diplôme à compléter]",
+  diploma: "BTS Diététique et Nutrition",
+  priceInitial: "55 €",
+  priceFollowUp: "35 €",
   experiences:
     "Milieu hospitalier — Expérience en diabétologie, en pédiatrie et en médecine générale.",
   sportBackground: "Milieu sportif — Accompagnement nutritionnel de pratiquants de MMA.",
@@ -35,6 +36,8 @@ export const site = {
   durationInitial: "60 minutes",
   durationFollowUp: "30 à 45 minutes",
   googleBusinessUrl: "",
+  /** TODO: URL de la fiche Google quand elle existera. La section Avis n’est pas affichée tant que ce lien et les avis ne sont pas prêts. */
+  googleReviewsUrl: "",
 
   mediatorName: "[Nom du médiateur de la consommation à compléter]",
   mediatorUrl: "",
@@ -62,8 +65,18 @@ export const site = {
     "Aucune donnée de santé n’est demandée lors de la prise de rendez-vous.",
 } as const;
 
-export const tariffSentence =
-  "Le tarif est communiqué avant la consultation, lors de la prise de rendez-vous.";
+export const tariffSentence = `Consultation initiale : ${site.priceInitial}. Consultation de suivi : ${site.priceFollowUp}.`;
+
+export type Review = {
+  author: string;
+  rating: number;
+  text: string;
+  date: string;
+};
+
+// TODO: la section Avis viendra plus tard, quand la fiche Google existera.
+// Ne pas inventer d’avis. Laisser ce tableau vide : rien ne l’affiche pour l’instant.
+export const reviews: readonly Review[] = [];
 
 export function isRealPhone(value: string) {
   return /^\+[1-9]\d{8,14}$/.test(value);

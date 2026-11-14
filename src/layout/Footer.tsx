@@ -28,6 +28,10 @@ export function Footer() {
           <p className="footer-lead">
             {site.practiceLine}
           </p>
+          <p className="home-contact">
+            <a href={`tel:${site.phoneTel}`}>{site.phoneDisplay}</a>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
         </div>
         <div>
           <p className="footer-label">Navigation</p>
@@ -77,8 +81,8 @@ export function Footer() {
       </div>
       <div className="container footer-bottom">
         <p>
-          Maquette de présentation. Les éléments entre crochets et les liens Calendly sont à remplacer. Aucun tarif
-          n’est publié. Hébergement de la maquette : {site.host.name}.
+          Maquette de présentation. Les éléments entre crochets et les liens Calendly sont à remplacer. Consultation
+          initiale : {site.priceInitial}. Consultation de suivi : {site.priceFollowUp}. Hébergement de la maquette : {site.host.name}.
         </p>
         <p>© 2026 {site.fullName}</p>
       </div>

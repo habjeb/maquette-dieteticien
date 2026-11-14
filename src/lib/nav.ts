@@ -24,10 +24,11 @@ export const NAV: readonly NavItem[] = [
       label: domain.title,
     })),
   },
-  { id: "a-propos", href: `${home}#a-propos`, label: "À propos" },
-  { id: "methode", href: `${home}#methode`, label: "Méthode" },
   { id: "consultations", href: `${home}#consultations`, label: "Consultations" },
+  { id: "a-propos", href: `${home}#a-propos`, label: "À propos" },
   { id: "faq", href: `${home}#faq`, label: "FAQ" },
+  { id: "rendez-vous", href: `${home}#rendez-vous`, label: "Rendez-vous" },
+  { id: "reperes", href: `${home}#reperes`, label: "Repères" },
 ];
 
 export const SECTION_IDS = NAV.map((item) => item.id);
