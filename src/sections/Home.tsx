@@ -69,8 +69,46 @@ function Reveal({ children, className = "" }: { children: ReactNode; className?:
 }
 
 function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [wash, setWash] = useState(() => "gpu" in navigator && Boolean(navigator.gpu));
+
+  useEffect(() => {
+    if (!wash) return;
+    const canvas = canvasRef.current;
+    const section = sectionRef.current;
+    if (!canvas || !section) return;
+    let stop: (() => void) | undefined;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const adapter = await navigator.gpu?.requestAdapter({ powerPreference: "low-power" });
+        if (!adapter || cancelled) {
+          if (!cancelled) setWash(false);
+          return;
+        }
+        const mod = await import("../fx/heroWash");
+        if (cancelled) return;
+        stop = mod.startHeroWash(canvas, section, {
+          onReady: () => canvas.classList.add("is-live"),
+          onFallback: () => {
+            if (!cancelled) setWash(false);
+          },
+        });
+        if (cancelled) stop();
+      } catch {
+        if (!cancelled) setWash(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      stop?.();
+    };
+  }, [wash]);
+
   return (
-    <section className="home-hero" id="accueil">
+    <section className="home-hero" id="accueil" ref={sectionRef}>
+      {wash ? <canvas ref={canvasRef} className="home-hero-wash" aria-hidden="true" /> : null}
       <div className="container home-hero-grid">
         <Reveal>
           <h1 data-reveal="title" data-reveal-after="intro">

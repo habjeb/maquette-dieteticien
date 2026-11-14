@@ -1,6 +1,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { wgslVitePlugin } from "@vgpu/wgsl/loader-vite";
 import react from "@vitejs/plugin-react";
 import { build } from "esbuild";
 import { defineConfig, type Plugin } from "vite";
@@ -131,6 +132,6 @@ export default defineConfig(async () => {
 
   return {
     base: "/maquette-dieteticien/",
-    plugins: [react(), seoPlugin(mod.manifest.pages), preloadDisplayFont()],
+    plugins: [react(), wgslVitePlugin(), seoPlugin(mod.manifest.pages), preloadDisplayFont()],
   };
 });
