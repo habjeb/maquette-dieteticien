@@ -784,8 +784,22 @@ html.is-zooming:not([data-flip]) .book-bar {
 .reveal-visual { display: block; }
 .faq-q { display: block; flex: 1; min-width: 0; }
 
-.home-hero { padding: 2.5rem 0 2.25rem; }
-.home-hero-grid { display: grid; gap: 1.75rem; align-items: end; }
+.home-hero { position: relative; padding: 2.5rem 0 2.25rem; }
+.home-hero-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+}
+.home-hero-wash.is-live { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero-wash { transition: opacity 0.8s ease; }
+}
+.home-hero-grid { position: relative; z-index: 1; display: grid; gap: 1.75rem; align-items: end; }
 .home-hero-photo { margin: 0; border-radius: 1.6rem; overflow: hidden; background: var(--sage); }
 .home-hero-photo img { width: 100%; height: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
 .home-hero-photo img,
